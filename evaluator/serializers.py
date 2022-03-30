@@ -91,9 +91,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 class SubmissionSerializer(DynamicFieldsModelSerializer):
     exercise_name = serializers.CharField(source="exercise.name")
-    student = serializers.CharField(source="user.first_name")
+    student = serializers.SerializerMethodField()
     date = serializers.DateTimeField(format="%d/%m/%Y", source="evaluated_at")
     time = serializers.DateTimeField(format="%H:%M:%S", source="evaluated_at")
+
+    def get_student(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}"
 
     class Meta:
         model = Submission

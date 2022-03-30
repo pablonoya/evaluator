@@ -10,6 +10,7 @@ import DataTable from "../../components/DataTable"
 import TopicChips from "../../components/TopicChips"
 
 import taskService from "../../services/taskService"
+import SearchInput from "../../components/SearchInput"
 
 export default function Tasks(props) {
   const { showNotification } = props
@@ -17,6 +18,7 @@ export default function Tasks(props) {
   const [data, setData] = useState({ results: [], count: 0 })
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
+  const [query, setQuery] = useState()
 
   const columns = [
     { field: "name", headerName: "Nombre", flex: 0.3 },
@@ -40,7 +42,10 @@ export default function Tasks(props) {
     try {
       setLoading(true)
 
-      const res = await taskService.getAll({ page: page })
+      const res = await taskService.getAll({
+        page: page,
+        ...(query && { search: query }),
+      })
       if (res.status === 200) {
         setData(res.data)
       }
@@ -89,16 +94,17 @@ export default function Tasks(props) {
 
   useEffect(() => {
     getAll()
-  }, [page])
+  }, [page, query])
 
   return (
     <div>
       <Grid container>
-        <Grid item xs={7}>
+        <Grid item xs={5}>
           <Typography variant="h5">Tareas</Typography>
         </Grid>
-        <Grid item xs={5}>
+        <Grid item xs={7}>
           <Grid container justifyContent="flex-end">
+            <SearchInput query={query} setQuery={setQuery} placeholder="Buscar por nombre..." />
             <Box sx={{ "& > button, a": { ml: 1, mb: 1 } }}>
               <LoadingButton
                 variant="outlined"

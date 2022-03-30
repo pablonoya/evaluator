@@ -10,6 +10,7 @@ import studentService from "../../services/studentService"
 
 import FormDialog from "./FormDialog"
 import PasswordDialog from "./PasswordDialog"
+import SearchInput from "../../components/SearchInput"
 
 export default function Tasks(props) {
   const { showNotification } = props
@@ -17,6 +18,8 @@ export default function Tasks(props) {
   const [data, setData] = useState({ results: [], count: 0 })
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState(false)
   const [formValues, setFormValues] = useState()
@@ -24,6 +27,7 @@ export default function Tasks(props) {
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false)
   const [restoredPassword, setRestoredPassword] = useState(false)
   const [userId, setUserId] = useState(0)
+  const [query, setQuery] = useState()
 
   const columns = [
     { field: "cu", headerName: "CU", flex: 0.1 },
@@ -43,7 +47,11 @@ export default function Tasks(props) {
   async function getStudents() {
     setLoading(true)
     try {
-      const res = await studentService.getAll({ page: page })
+      const res = await studentService.getAll({
+        page: page,
+        page_size: pageSize,
+        ...(query && { search: query }),
+      })
 
       if (res.status == 200) {
         setData(res.data)
@@ -99,17 +107,22 @@ export default function Tasks(props) {
 
   useEffect(() => {
     getStudents()
-  }, [page])
+  }, [page, query])
 
   return (
     <Container>
       <Grid container>
-        <Grid item xs={7}>
+        <Grid item xs={1}>
           <Typography variant="h5">Estudiantes</Typography>
         </Grid>
-        <Grid item xs={5}>
+        <Grid item xs={11}>
           <Grid container justifyContent="flex-end">
             <Box sx={{ "& > button, a": { ml: 1, mb: 1 } }}>
+              <SearchInput
+                query={query}
+                setQuery={setQuery}
+                placeholder="CU, nombre o apellido..."
+              />
               <LoadingButton
                 variant="outlined"
                 startIcon={<Refresh />}
@@ -142,6 +155,8 @@ export default function Tasks(props) {
         rowCount={data.count}
         onPageChange={page => setPage(page + 1)}
         loading={loading}
+        pageSize={pageSize}
+        onPageSizeChange={size => setPageSize(size)}
       />
 
       <FormDialog

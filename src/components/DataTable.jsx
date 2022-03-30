@@ -3,8 +3,6 @@ import {
   GridToolbarColumnsButton,
   GridToolbarContainer,
   GridToolbarDensitySelector,
-  GridToolbarExport,
-  GridToolbarFilterButton,
 } from "@mui/x-data-grid"
 import { useCallback } from "react"
 
@@ -12,7 +10,6 @@ function CustomToolbar() {
   return (
     <GridToolbarContainer>
       <GridToolbarColumnsButton />
-      <GridToolbarFilterButton />
       <GridToolbarDensitySelector />
     </GridToolbarContainer>
   )
@@ -39,7 +36,9 @@ export default function DataTable(props) {
         paginationMode="server"
         filterMode="server"
         onFilterModelChange={onFilterChange}
-        components={{ Toolbar: CustomToolbar }}
+        components={{
+          Toolbar: CustomToolbar,
+        }}
         {...otherProps}
       />
     </div>

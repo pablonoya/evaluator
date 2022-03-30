@@ -1,5 +1,4 @@
 import asyncio
-from rest_framework import permissions
 
 from rq.job import Retry
 from django_rq.queues import get_queue
@@ -9,7 +8,8 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import DjangoModelPermissions, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import filters
 
 from evaluator.models import Exercise, Submission
 from evaluator.serializers import ExerciseSerializer
@@ -46,6 +46,8 @@ class ExerciseView(viewsets.ModelViewSet):
     queryset = Exercise.objects.all()
     serializer_class = ExerciseSerializer
     permission_classes = (IsAuthenticated,)
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name"]
 
     def get_queryset(self):
         queryset = Exercise.objects.all()
@@ -56,6 +58,8 @@ class ExerciseView(viewsets.ModelViewSet):
             queryset = queryset.filter(task_id=int(task))
         if ids:
             queryset = queryset.filter(id__in=ids.split(","))
+
+        queryset = self.filter_queryset(queryset)
 
         return queryset
 

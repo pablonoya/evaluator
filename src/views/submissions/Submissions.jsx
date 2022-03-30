@@ -8,12 +8,17 @@ import DataTable from "../../components/DataTable"
 import SubmissionDetail from "./SubmissionDetail"
 
 import submissionService from "../../services/submissionService"
+import SearchInput from "../../components/SearchInput"
+import { Box } from "@mui/system"
 
 export default function Submissions(props) {
   const { showNotification } = props
 
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [query, setQuery] = useState()
+
   const [data, setData] = useState({ results: [], count: 0 })
   const [open, setOpen] = useState(false)
   const [details, setDetails] = useState([])
@@ -34,7 +39,11 @@ export default function Submissions(props) {
     try {
       setLoading(true)
 
-      const res = await submissionService.getAll({ page: page })
+      const res = await submissionService.getAll({
+        page: page,
+        page_size: pageSize,
+        ...(query && { search: query }),
+      })
       if (res.status == 200) {
         setData(res.data)
       }
@@ -70,26 +79,33 @@ export default function Submissions(props) {
 
   useEffect(() => {
     getSubmissions(page)
-  }, [page])
+  }, [page, query])
 
   return (
     <Container>
       <Grid container>
-        <Grid item xs={7}>
+        <Grid item xs={1}>
           <Typography variant="h5">Envíos</Typography>
         </Grid>
-        <Grid item xs={5}>
+        <Grid item xs={11}>
           <Grid container justifyContent="flex-end">
-            <LoadingButton
-              sx={{ mb: 1 }}
-              variant="outlined"
-              startIcon={<Refresh />}
-              loading={loading}
-              loadingPosition="start"
-              onClick={() => getSubmissions()}
-            >
-              Actualizar
-            </LoadingButton>
+            <Box sx={{ "& > button": { ml: 1, mb: 1 } }}>
+              <SearchInput
+                query={query}
+                setQuery={setQuery}
+                placeholder="Ejercicio o estudiante..."
+              />
+              <LoadingButton
+                sx={{ mb: 1 }}
+                variant="outlined"
+                startIcon={<Refresh />}
+                loading={loading}
+                loadingPosition="start"
+                onClick={() => getSubmissions()}
+              >
+                Actualizar
+              </LoadingButton>
+            </Box>
           </Grid>
         </Grid>
       </Grid>
@@ -100,6 +116,8 @@ export default function Submissions(props) {
         rowCount={data.count}
         onPageChange={handlePageChange}
         loading={loading}
+        pageSize={pageSize}
+        onPageSizeChange={size => setPageSize(size)}
       />
 
       <SubmissionDetail

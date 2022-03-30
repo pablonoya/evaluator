@@ -2,7 +2,7 @@ import { IconButton, TextField } from "@mui/material"
 import { Clear, Search } from "@mui/icons-material"
 
 export default function SearchInput(props) {
-  const { query, setQuery } = props
+  const { query, setQuery, ...rest } = props
 
   return (
     <TextField
@@ -22,6 +22,7 @@ export default function SearchInput(props) {
           </IconButton>
         ),
       }}
+      {...rest}
     />
   )
 }

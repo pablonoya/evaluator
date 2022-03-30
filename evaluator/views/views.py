@@ -27,6 +27,8 @@ class TopicView(viewsets.ModelViewSet):
 class UserView(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["first_name", "last_name", "username", "student__cu"]
 
     def get_queryset(self):
         studentGroup = Group.objects.filter(name="Alumnos").first()
@@ -87,11 +89,15 @@ class UserView(viewsets.ModelViewSet):
 class TaskView(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name"]
 
 
 class SubmissionView(viewsets.ModelViewSet):
     serializer_class = SubmissionSerializer
     permission_classes = (IsAuthenticated,)
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["exercise__name", "user__first_name", "user__last_name"]
 
     def get_queryset(self):
         user = User.objects.get(id=self.request.user.id)
@@ -101,7 +107,7 @@ class SubmissionView(viewsets.ModelViewSet):
         if student_group in user.groups.all():
             queryset = queryset.filter(user=self.request.user.id)
 
-        return queryset
+        return self.filter_queryset(queryset)
 
     def list(self, request, *args, **kwargs):
         submissions = self.get_queryset()

@@ -104,7 +104,7 @@ export default function Topics(props) {
         <Grid item xs={7}>
           <Grid container justifyContent="flex-end">
             <Box sx={{ "& > button, a": { ml: 1, mb: 1 } }}>
-              <SearchInput query={query} setQuery={setQuery} />
+              <SearchInput query={query} setQuery={setQuery} placeholder="Buscar por nombre..." />
               <LoadingButton
                 variant="outlined"
                 startIcon={<Refresh />}

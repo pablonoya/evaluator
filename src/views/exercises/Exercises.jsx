@@ -11,11 +11,11 @@ import exerciseService from "../../services/exerciseService"
 
 import DataTable from "../../components/DataTable"
 import TopicChips from "../../components/TopicChips"
-import SelectTasks from "../../components/SelectTasks"
 import { useAuth } from "../../components/context"
 import { filterItemsByGroups } from "../../utils"
 
 import FormDialog from "./FormDialog"
+import SearchInput from "../../components/SearchInput"
 
 const initialFormValues = {
   name: "",
@@ -46,6 +46,8 @@ export default function Exercises(props) {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+  const [query, setQuery] = useState()
+
   const [open, setOpen] = useState(false)
 
   const [editing, setEditing] = useState(false)
@@ -80,9 +82,9 @@ export default function Exercises(props) {
     setLoading(true)
     try {
       const res = await exerciseService.getAll({
-        task: taskId,
         page: page,
         page_size: pageSize,
+        ...(query && { search: query }),
       })
       setData(res.data)
     } catch (err) {
@@ -135,22 +137,18 @@ export default function Exercises(props) {
 
   useEffect(() => {
     getAllExercises()
-  }, [taskId, page, pageSize])
+  }, [taskId, page, pageSize, query])
 
   return (
     <Container>
       <Grid container>
-        <Grid item xs={6}>
+        <Grid item xs={5}>
           <Typography variant="h5">Ejercicios</Typography>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={7}>
           <Grid container justifyContent="flex-end">
             <Box sx={{ "& > button": { ml: 1, mb: 1 } }}>
-              {/* <SelectTasks
-                value={taskId}
-                onChange={event => setTaskId(event.target.value)}
-                displayEmpty
-              /> */}
+              <SearchInput query={query} setQuery={setQuery} placeholder="Buscar por nombre..." />
               <LoadingButton
                 variant="outlined"
                 startIcon={<Refresh />}
