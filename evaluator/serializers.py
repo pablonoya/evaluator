@@ -1,5 +1,6 @@
+from pydoc_data.topics import topics
 from rest_framework import serializers
-from .models import Submission, Task, Exercise, Topic
+from .models import Assignment, Submission, Task, Exercise, Topic
 
 from django.contrib.auth.models import Group, User
 
@@ -26,12 +27,23 @@ class TopicSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class AssignmentSerializer(serializers.ModelSerializer):
+    topic_name = serializers.StringRelatedField(source="topic.name")
+
+    class Meta:
+        model = Assignment
+        fields = "__all__"
+
+
 class TaskSerializer(serializers.ModelSerializer):
     topics = TopicSerializer(many=True, read_only=False)
+    assignments = AssignmentSerializer(
+        source="assignment_set", many=True, read_only=False
+    )
 
     class Meta:
         model = Task
-        fields = ("id", "name", "topics")
+        fields = ("id", "name", "assignments", "topics")
 
     def create(self, validated_data):
         validated_data.pop("topics")

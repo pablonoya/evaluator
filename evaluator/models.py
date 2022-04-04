@@ -14,10 +14,16 @@ class Topic(models.Model):
 
 class Task(models.Model):
     name = models.CharField(max_length=255)
-    topics = models.ManyToManyField(Topic)
+    topics = models.ManyToManyField(Topic, through="Assignment")
 
     def __str__(self):
         return self.name
+
+
+class Assignment(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
+    exercises_number = models.IntegerField(default=0)
 
 
 class Exercise(models.Model):
