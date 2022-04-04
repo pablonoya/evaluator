@@ -6,24 +6,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import filters
 
-from evaluator.models import Submission, Task, Topic
-from evaluator.serializers import (
-    TopicSerializer,
-    UserSerializer,
-    SubmissionSerializer,
-    TaskSerializer,
-)
-
+from evaluator.models import Submission
+from evaluator.serializers import UserSerializer, SubmissionSerializer
 
 # Create your views here.
-class TopicView(viewsets.ModelViewSet):
-    serializer_class = TopicSerializer
-    queryset = Topic.objects.all()
-    permission_classes = (IsAuthenticated,)
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ["name"]
-
-
 class UserView(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
@@ -84,13 +70,6 @@ class UserView(viewsets.ModelViewSet):
 
         user.save()
         return Response("Perfil actualizado")
-
-
-class TaskView(viewsets.ModelViewSet):
-    serializer_class = TaskSerializer
-    queryset = Task.objects.all()
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ["name"]
 
 
 class SubmissionView(viewsets.ModelViewSet):

@@ -141,16 +141,6 @@ class ExerciseView(viewsets.ModelViewSet):
         Exercise.objects.filter(id__in=exercise_ids).update(task=task_id)
         return Response(data={"message": "Exercises updated"}, status=200)
 
-    @action(detail=False, methods=["PUT"], name="release")
-    def release(self, request, *args, **kwargs):
-        exercise_id = request.data["id"]
-
-        exercise = Exercise.objects.get(id=exercise_id)
-        exercise.task = None
-        exercise.save()
-
-        return Response(data={"message": "Exercise released"}, status=200)
-
     @action(detail=False, methods=["POST"], name="submit")
     def submit(self, request, *args, **kwargs):
         exercise_id = request.data["id"]
