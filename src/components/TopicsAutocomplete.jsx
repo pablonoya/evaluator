@@ -22,7 +22,8 @@ export default function TopicsAutocomplete(props) {
     setLoading(true)
 
     try {
-      const { data } = await topicService.getAll({ page_size: 20, name: query })
+      const { data } = await topicService.getAll({ page_size: 20, search: query })
+
       setTopics([...choosedTopics, ...data.results])
     } catch (err) {
       showNotification("error", err.toString())
@@ -36,7 +37,6 @@ export default function TopicsAutocomplete(props) {
   }, [query])
 
   useEffect(() => {
-    setTopics(selectedTopics)
     setChoosedTopics(selectedTopics)
   }, [selectedTopics])
 
@@ -54,13 +54,13 @@ export default function TopicsAutocomplete(props) {
       filterOptions={x => x}
       onOpen={() => getAllTopics()}
       onClose={() => setTopics([])}
-      isOptionEqualToValue={(option, value) => option.id === value.id}
-      getOptionLabel={option => option.name}
+      isOptionEqualToValue={(option, value) => option?.id === value.id}
+      getOptionLabel={option => option.name || ""}
       onChange={(_e, value) => setChoosedTopics(value)}
       onInputChange={(_e, value) => setQuery(value)}
       renderTags={(value, getTagProps) =>
         value.map((option, index) => (
-          <Chip variant="outlined" label={option.name} {...getTagProps({ index })} />
+          <Chip variant="outlined" label={option?.name} {...getTagProps({ index })} />
         ))
       }
       renderInput={params => {
