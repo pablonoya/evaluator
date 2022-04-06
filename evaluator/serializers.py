@@ -1,3 +1,4 @@
+from asyncio import tasks
 from pydoc_data.topics import topics
 from rest_framework import serializers
 from .models import Assignment, Submission, Task, Exercise, Topic
@@ -28,7 +29,7 @@ class TopicSerializer(serializers.ModelSerializer):
 
 
 class AssignmentSerializer(serializers.ModelSerializer):
-    topic_name = serializers.StringRelatedField(source="topic.name")
+    name = serializers.StringRelatedField(source="topic.name")
 
     class Meta:
         model = Assignment
@@ -36,36 +37,29 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    topics = TopicSerializer(many=True, read_only=False)
     assignments = AssignmentSerializer(
         source="assignment_set", many=True, read_only=False
     )
 
     class Meta:
         model = Task
-        fields = ("id", "name", "assignments", "topics")
+        fields = ("id", "name", "assignments")
 
     def create(self, validated_data):
-        validated_data.pop("topics")
-        topic_ids = [topic["id"] for topic in self.initial_data["topics"]]
-
+        validated_data.pop("assignment_set")
         instance = Task.objects.create(**validated_data)
-        instance.topics.set(topic_ids)
-        instance.save()
+
+        assignment_ids = [
+            assignment["id"] for assignment in self.initial_data["assignments"]
+        ]
+        Assignment.objects.filter(id__in=assignment_ids).update(task_id=instance.id)
 
         return instance
 
     def update(self, instance, validated_data):
-        validated_data.pop("topics")
-        topic_ids = [topic["id"] for topic in self.initial_data["topics"]]
+        validated_data.pop("assignment_set")
 
-        for (key, value) in validated_data.items():
-            setattr(instance, key, value)
-
-        instance.topics.set(topic_ids)
-        instance.save()
-
-        return instance
+        return super().update(instance, validated_data)
 
 
 class UserSerializer(serializers.ModelSerializer):

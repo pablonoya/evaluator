@@ -21,7 +21,7 @@ class Task(models.Model):
 
 
 class Assignment(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, null=True, on_delete=models.CASCADE)
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
     exercises_number = models.IntegerField(default=0)
 

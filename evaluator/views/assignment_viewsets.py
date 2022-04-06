@@ -37,12 +37,3 @@ class AssignmentView(viewsets.ModelViewSet):
     serializer_class = AssignmentSerializer
     queryset = Assignment.objects.all()
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-
-    def get_queryset(self):
-        queryset = self.get_queryset()
-
-        task = self.kwargs["task"]
-        if task is not None:
-            queryset = queryset.filter(task=task)
-
-        return self.filter_queryset(queryset)
