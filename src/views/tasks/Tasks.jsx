@@ -12,6 +12,10 @@ import TopicChips from "../../components/TopicChips"
 import taskService from "../../services/taskService"
 import SearchInput from "../../components/SearchInput"
 
+function topicsCell(params) {
+  return <TopicChips topics={params.row.assignments} />
+}
+
 export default function Tasks(props) {
   const { showNotification } = props
 
@@ -23,7 +27,7 @@ export default function Tasks(props) {
   const columns = [
     { field: "name", headerName: "Nombre", flex: 0.3 },
     {
-      field: "topics",
+      field: "assignments",
       headerName: "Temas",
       flex: 0.5,
       sortable: true,
@@ -86,10 +90,6 @@ export default function Tasks(props) {
         </IconButton>
       </>
     )
-  }
-
-  function topicsCell(params) {
-    return <TopicChips topics={params.row.topics} />
   }
 
   useEffect(() => {
