@@ -5,19 +5,28 @@ import { Formik, Form } from "formik"
 
 import { Button, Grid, Container, Typography, IconButton } from "@mui/material"
 import DialogContentText from "@material-ui/core/DialogContentText"
-
 import { Box } from "@mui/system"
-import { Add, Casino, Clear } from "@mui/icons-material"
+
+import { Add, Clear, Create } from "@mui/icons-material"
 
 import DataTable from "../../components/DataTable"
 import TextFieldForm from "../../components/TextFieldForm"
-import TopicsAutocomplete from "../../components/TopicsAutocomplete"
-import ExercisesDialog from "./ExercisesDialog"
-import SortingDialog from "./SortingDialog"
+import TopicsDialog from "./TopicsDialog"
 
 import taskService from "../../services/taskService"
-import exerciseService from "../../services/exerciseService"
-import TopicChips from "../../components/TopicChips"
+
+function RemoveButton(props) {
+  return (
+    <>
+      <IconButton onClick={props.handleEdit}>
+        <Create />
+      </IconButton>
+      <IconButton onClick={props.handleRemove}>
+        <Clear />
+      </IconButton>
+    </>
+  )
+}
 
 export default function TaskForm(props) {
   const { showNotification } = props
@@ -25,69 +34,65 @@ export default function TaskForm(props) {
   const { taskId } = useParams()
   const history = useHistory()
 
-  const [taskData, setTaskData] = useState({ name: "", topics: [] })
-  const [openSortingDialog, setOpenSortingDialog] = useState(false)
-  const [openExercisesDialog, setOpenExercisesDialog] = useState(false)
-
-  const [exercises, setExercises] = useState([])
-  const [count, setCount] = useState(0)
+  const [taskData, setTaskData] = useState({ name: "" })
+  const [assignments, setAssignments] = useState([])
 
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(5)
 
+  const [edit, setEdit] = useState(false)
+  const [assignment, setAssignment] = useState(null)
+  const [openDialog, setOpenDialog] = useState(false)
+
   const editing = taskId != null
 
   const exercisesColumns = [
-    { field: "name", headerName: "Nombre", flex: 0.4 },
     {
-      field: "topics",
-      headerName: "Temas",
-      flex: 0.4,
-      renderCell: params => <TopicChips topics={params.row.topics} />,
+      headerName: "Tema",
+      field: "name",
+      flex: 0.7,
+    },
+    {
+      headerName: "Nro. de ejercicios",
+      field: "exercises_number",
+      flex: 0.2,
     },
     {
       field: "remove",
       sortable: false,
-      headerName: "Eliminar",
+      headerName: "Acciones",
       flex: 0.1,
-      renderCell: params => {
-        function removeExercise() {
-          if (editing) {
-            releaseExercise(params.row.id)
-          } else {
-            setExercises(state => state.filter(e => e.id !== params.row.id))
-          }
-        }
-        return (
-          <IconButton onClick={removeExercise}>
-            <Clear />
-          </IconButton>
-        )
-      },
+      renderCell: params => (
+        <RemoveButton
+          handleEdit={() => handleEdit(params)}
+          handleRemove={() => handleRemove(params)}
+        />
+      ),
     },
   ]
 
-  async function getTask(id) {
-    try {
-      const { data } = await taskService.get(id)
-      setTaskData(data)
-    } catch (err) {
-      showNotification("error", err.toString())
+  function handleEdit(params) {
+    setEdit(true)
+    setOpenDialog(true)
+    setAssignment(params.row)
+  }
+
+  function handleRemove(params) {
+    if (editing) {
+      releaseAssignment(params.row.id)
+    } else {
+      setAssignments(state => state.filter(t => t.id !== params.row.id))
     }
   }
 
-  async function getExercisesByTask(taskId) {
+  async function getTask(id) {
     try {
       setLoading(true)
-      const { data } = await exerciseService.getAll({
-        task: taskId,
-        page: page + 1,
-        page_size: pageSize,
-      })
+      const { data } = await taskService.get(id)
 
-      setExercises(data.results)
-      setCount(data.count)
+      setTaskData(data)
+      setAssignments(data.assignments)
     } catch (err) {
       showNotification("error", err.toString())
     } finally {
@@ -95,19 +100,24 @@ export default function TaskForm(props) {
     }
   }
 
-  async function releaseExercise(exerciseId) {
+  async function releaseAssignment(id) {
     try {
-      const { status } = await exerciseService.release({ id: exerciseId })
+      setLoading(true)
+      const { status } = await taskService.release(taskId, { assignment: id })
 
       if (status === 200) {
-        setExercises(state => state.filter(e => e.id !== exerciseId))
+        setAssignments(state => state.filter(e => e.id !== id))
       }
     } catch (err) {
       showNotification("error", err.toString())
+    } finally {
+      setLoading(false)
     }
   }
 
   async function handleSubmit(values) {
+    values.assignments = assignments
+
     try {
       if (editing) {
         const { status } = await taskService.update(values.id, values)
@@ -116,12 +126,7 @@ export default function TaskForm(props) {
           showNotification("success", `Tarea ${values.name} editada`)
         }
       } else {
-        const { data, status } = await taskService.create(values)
-
-        await exerciseService.updateTask({
-          ids: exercises.map(e => e.id),
-          taskId: data.id,
-        })
+        const { status } = await taskService.create(values)
 
         if (status == 201) {
           showNotification("success", `Tarea ${values.name} creada`)
@@ -136,19 +141,8 @@ export default function TaskForm(props) {
   useEffect(() => {
     if (editing) {
       getTask(taskId)
-      getExercisesByTask(taskId)
     }
   }, [taskId, page, pageSize])
-
-  useEffect(() => {
-    if (!openExercisesDialog || !openSortingDialog) {
-      if (taskId) {
-        getExercisesByTask(taskId)
-      } else {
-        setCount(exercises.length)
-      }
-    }
-  }, [openExercisesDialog, openSortingDialog])
 
   return (
     <Container>
@@ -157,108 +151,75 @@ export default function TaskForm(props) {
           <Typography variant="h5">{editing ? "Editar " + taskData.name : "Nueva tarea"}</Typography>
         </Grid>
         <Grid item xs={12}>
-          <DialogContentText>Seleccione los temas y ejercicios para esta tarea.</DialogContentText>
+          <DialogContentText>
+            Seleccione los temas y la cantidad deejercicios para esta tarea.
+          </DialogContentText>
         </Grid>
       </Grid>
 
       <Formik initialValues={taskData} onSubmit={handleSubmit} enableReinitialize>
-        {({ values }) => (
-          <Form>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <TextFieldForm name="name" label="Nombre" required />
-              </Grid>
-              <Grid item xs={6}>
-                <TopicsAutocomplete
-                  label="Temas"
-                  editing={editing}
-                  selectedTopics={taskData.topics}
-                  showNotification={showNotification}
-                  required
-                />
-              </Grid>
+        <Form>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextFieldForm name="name" label="Nombre" required />
+            </Grid>
 
-              <Grid item xs={12}>
-                <Grid container spacing={2} justifyContent="space-between">
-                  <Grid item xs={3}>
-                    <Typography variant="h6">Ejercicios</Typography>
-                  </Grid>
-                  <Grid item>
-                    <Box sx={{ "& > button": { ml: 1 } }}>
-                      <Button
-                        variant="outlined"
-                        startIcon={<Casino />}
-                        onClick={() => {
-                          if (!values.topics?.length) {
-                            showNotification("warning", "Debe elegir algunos temas")
-                            return
-                          }
-                          setOpenSortingDialog(true)
-                        }}
-                      >
-                        Sortear
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        startIcon={<Add />}
-                        onClick={() => {
-                          if (!values.topics?.length) {
-                            showNotification("warning", "Debe elegir algunos temas")
-                            return
-                          }
-                          setOpenExercisesDialog(true)
-                        }}
-                      >
-                        Añadir
-                      </Button>
-                    </Box>
-                  </Grid>
+            <Grid item xs={12}>
+              <Grid container spacing={2} justifyContent="space-between">
+                <Grid item xs={3}>
+                  <Typography variant="h6">Temas</Typography>
                 </Grid>
-              </Grid>
-
-              <Grid item xs={12}>
-                <DataTable
-                  loading={loading}
-                  page={page}
-                  rowCount={count}
-                  columns={exercisesColumns}
-                  rows={exercises}
-                  pageSize={pageSize}
-                  onPageChange={page => setPage(page)}
-                  onPageSizeChange={size => setPageSize(size)}
-                  disableSelectionOnClick
-                />
-              </Grid>
-
-              <Grid container justifyContent="end">
-                <Box sx={{ "& > button": { ml: 1, my: 1 } }}>
-                  <Button onClick={() => history.push("/tareas")}>Cancelar</Button>
-                  <Button variant="contained" type="submit">
-                    {editing ? "Guardar" : "Crear nuevo"}
-                  </Button>
-                </Box>
+                <Grid item>
+                  <Box sx={{ "& > button": { ml: 1 } }}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Add />}
+                      onClick={() => {
+                        setEdit(false)
+                        setOpenDialog(true)
+                      }}
+                    >
+                      Añadir
+                    </Button>
+                  </Box>
+                </Grid>
               </Grid>
             </Grid>
 
-            <ExercisesDialog
-              open={openExercisesDialog}
-              handleClose={() => setOpenExercisesDialog(false)}
-              topics={values.topics}
+            <Grid item xs={12}>
+              <DataTable
+                loading={loading}
+                page={page}
+                pageSize={pageSize}
+                onPageChange={page => setPage(page)}
+                onPageSizeChange={size => setPageSize(size)}
+                columns={exercisesColumns}
+                rows={assignments}
+                rowCount={assignments.length}
+              />
+            </Grid>
+
+            <TopicsDialog
+              edit={edit}
+              open={openDialog}
+              handleClose={() => setOpenDialog(false)}
               taskId={taskId}
-              setExercises={setExercises}
+              assignment={assignment}
+              assignments={assignments}
+              setAssignments={setAssignments}
               showNotification={showNotification}
             />
 
-            <SortingDialog
-              open={openSortingDialog}
-              handleClose={() => setOpenSortingDialog(false)}
-              topics={values.topics}
-              taskId={taskId}
-              setExercises={setExercises}
-              showNotification={showNotification}
-            />
-          </Form>
-        )}
+            <Grid container justifyContent="end">
+              <Box sx={{ "& > button": { ml: 1, my: 1 } }}>
+                <Button onClick={() => history.push("/tareas")}>Cancelar</Button>
+                <Button variant="contained" type="submit">
+                  {editing ? "Guardar" : "Crear"}
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </Form>
       </Formik>
     </Container>
   )

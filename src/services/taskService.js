@@ -24,6 +24,10 @@ class TaskService {
   delete(id) {
     return http.delete(`${this.url + id}/`)
   }
+
+  release(id, data) {
+    return http.put(`${this.url + id}/release/`, data)
+  }
 }
 
 export default new TaskService()
