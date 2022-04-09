@@ -7,7 +7,7 @@ import { Formik, Form } from "formik"
 
 import TextFieldForm from "../../components/TextFieldForm"
 
-import { useAuth } from "../../components/context"
+import { useAuth } from "../../contexts/authContext"
 import authService from "../../services/authService"
 import { useHistory } from "react-router-dom"
 

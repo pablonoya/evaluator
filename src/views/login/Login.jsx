@@ -1,6 +1,6 @@
 import { Button, Container, Grid } from "@mui/material"
 import { Form, Formik } from "formik"
-import { useAuth } from "../../components/context"
+import { useAuth } from "../../contexts/authContext"
 
 import TextFieldForm from "../../components/TextFieldForm"
 import authService from "../../services/authService"

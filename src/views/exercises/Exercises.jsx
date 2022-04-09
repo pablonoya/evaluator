@@ -11,7 +11,7 @@ import exerciseService from "../../services/exerciseService"
 
 import DataTable from "../../components/DataTable"
 import TopicChips from "../../components/TopicChips"
-import { useAuth } from "../../components/context"
+import { useAuth } from "../../contexts/authContext"
 import { filterItemsByGroups } from "../../utils"
 
 import FormDialog from "./FormDialog"

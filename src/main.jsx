@@ -8,7 +8,7 @@ import "@fontsource/roboto/400.css"
 import "@fontsource/roboto/500.css"
 import "@fontsource/roboto/700.css"
 
-import { AuthProvider } from "./components/context"
+import { AuthProvider } from "./contexts/authContext"
 import { BrowserRouter } from "react-router-dom"
 
 import App from "./App"

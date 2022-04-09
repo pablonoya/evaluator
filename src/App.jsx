@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react"
 import { Route, Redirect, Switch } from "react-router-dom"
-import { useAuth } from "./components/context"
+
+import { useAuth } from "./contexts/authContext"
 import Loading from "./components/Loading"
 
 const Login = lazy(() => import("./views/login/Login.jsx"))

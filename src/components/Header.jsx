@@ -6,7 +6,7 @@ import { AccountCircle } from "@mui/icons-material"
 
 import { useHistory } from "react-router-dom"
 
-import { useAuth } from "./context"
+import { useAuth } from "../contexts/authContext"
 
 export default function Header(props) {
   const { drawerWidth, handleOpen } = props

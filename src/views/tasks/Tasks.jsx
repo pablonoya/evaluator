@@ -12,6 +12,8 @@ import TopicChips from "../../components/TopicChips"
 import taskService from "../../services/taskService"
 import SearchInput from "../../components/SearchInput"
 
+import { useAuth } from "../../contexts/authContext"
+
 function topicsCell(params) {
   return <TopicChips topics={params.row.assignments} />
 }
