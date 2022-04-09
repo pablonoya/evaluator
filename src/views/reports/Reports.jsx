@@ -2,10 +2,10 @@ import { useState } from "react"
 import { Autocomplete, Container, Grid, TextField, Typography } from "@mui/material"
 import { useEffect } from "react"
 
-import statsService from "../../services/statsService"
+import reportsService from "../../services/reportsService"
 import DataTable from "../../components/DataTable"
 
-const statsList = [
+const reportsList = [
   {
     title: "Calificaciones por estudiante",
     url: "/score_per_student",
@@ -34,7 +34,7 @@ const statsList = [
   },
 ]
 
-export default function Stats(props) {
+export default function Reports(props) {
   const { showNotification } = props
 
   const [data, setData] = useState(null)
@@ -44,11 +44,11 @@ export default function Stats(props) {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
 
-  async function getStat() {
+  async function getReport() {
     setLoading(true)
 
     try {
-      const { data } = await statsService.get(stat.url, {
+      const { data } = await reportsService.get(stat.url, {
         page: page,
         page_size: pageSize,
       })
@@ -62,7 +62,7 @@ export default function Stats(props) {
 
   useEffect(() => {
     if (stat) {
-      getStat()
+      getReport()
     }
   }, [stat, page, page, pageSize])
 
@@ -70,14 +70,14 @@ export default function Stats(props) {
     <Container>
       <Grid container>
         <Grid item xs={8}>
-          <Typography variant="h5">Estadísticas</Typography>
+          <Typography variant="h5">Reportes</Typography>
         </Grid>
 
         <Grid item xs={4}>
           <Autocomplete
             size="small"
             noOptionsText="No encontrado"
-            options={statsList}
+            options={reportsList}
             value={stat}
             getOptionLabel={val => val.title}
             onChange={(_e, newValue) => setStat(newValue)}

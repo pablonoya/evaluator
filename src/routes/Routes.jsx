@@ -14,7 +14,7 @@ import SubmissionQueue from "../views/submissions/SubmissionQueue"
 
 import Students from "../views/students/Students"
 import Topics from "../views/topics/Topics"
-import Stats from "../views/stats/Stats"
+import Reports from "../views/reports/Reports"
 
 export default function Routes(props) {
   const { showNotification } = props
@@ -51,8 +51,8 @@ export default function Routes(props) {
       <Route path="/envios">
         <Submissions showNotification={showNotification} />
       </Route>
-      <Route path="/estadisticas">
-        <Stats showNotification={showNotification} />
+      <Route path="/reportes">
+        <Reports showNotification={showNotification} />
       </Route>
       <Route path="/perfil">
         <Profile showNotification={showNotification} />

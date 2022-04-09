@@ -1,8 +1,8 @@
 import http from "./http-common"
 
-class StatsService {
+class ReportsService {
   constructor() {
-    this.url = "/evaluator/api/stats"
+    this.url = "/evaluator/api/reports"
   }
 
   get(url, params) {
@@ -10,4 +10,4 @@ class StatsService {
   }
 }
 
-export default new StatsService()
+export default new ReportsService()

@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from evaluator.models import Submission
 
 
-class StatView(mixins.ListModelMixin, viewsets.GenericViewSet):
+class ReportView(mixins.ListModelMixin, viewsets.GenericViewSet):
     @action(detail=False, methods=["GET"])
     def submissions_per_exercise(self, request):
         queryset = (

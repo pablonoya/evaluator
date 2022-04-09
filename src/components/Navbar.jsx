@@ -12,19 +12,10 @@ import {
   ListItemText,
 } from "@mui/material"
 
-import {
-  Home,
-  Assignment,
-  Create,
-  Send,
-  Group,
-  Topic,
-  Description,
-  BarChart,
-} from "@mui/icons-material/"
+import { Home, Assignment, Send, Group, Topic, Description, BarChart } from "@mui/icons-material/"
 
 import { filterItemsByGroups } from "../utils"
-import { useAuth } from "./context"
+import { useAuth } from "../contexts/authContext"
 
 const items = [
   {
@@ -37,7 +28,6 @@ const items = [
     icon: <Assignment />,
     name: "Tareas",
     route: "/tareas",
-    groups: ["Docente"],
   },
   {
     icon: <Description />,
@@ -65,8 +55,8 @@ const items = [
   },
   {
     icon: <BarChart />,
-    name: "Estadísticas",
-    route: "/estadisticas",
+    name: "Reportes",
+    route: "/reportes",
     groups: ["Docente"],
   },
 ]
