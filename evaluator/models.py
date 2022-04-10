@@ -85,3 +85,9 @@ def save_user_student(sender, instance, **kwargs):
 
     if not student:
         Student.objects.create(user=instance)
+
+
+class Practice(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    exercises = models.ManyToManyField(Exercise)
