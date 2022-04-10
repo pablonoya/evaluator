@@ -21,7 +21,7 @@ const AuthProvider = props => {
   function handleAuth(userInfo) {
     if (userInfo) {
       setAuth(userInfo)
-      history.push("/")
+      history.goBack()
     } else {
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")

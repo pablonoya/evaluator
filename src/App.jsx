@@ -23,17 +23,18 @@ function App() {
 }
 
 function PrivateRoute({ children, ...rest }) {
-  const [auth, handleAuth] = useAuth(useAuth)
+  const [auth] = useAuth(useAuth)
+
   return (
     <Route
-      {...rest}
       render={() => {
         return auth ? (
           <Suspense fallback={<Loading />}>{children}</Suspense>
         ) : (
-          <Redirect to="/login" />
+          <Redirect push to="/login" />
         )
       }}
+      {...rest}
     />
   )
 }
