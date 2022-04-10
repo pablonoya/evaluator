@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link as RouterLink } from "react-router-dom"
 
-import { Button, Grid, IconButton, Typography } from "@mui/material"
+import { Button, Grid, IconButton, Typography, Link, Container } from "@mui/material"
 import { Box } from "@mui/system"
 import { Add, Create, Delete, Refresh } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
@@ -13,9 +13,18 @@ import taskService from "../../services/taskService"
 import SearchInput from "../../components/SearchInput"
 
 import { useAuth } from "../../contexts/authContext"
+import { filterItemsByGroups } from "../../utils"
 
 function topicsCell(params) {
   return <TopicChips topics={params.row.assignments} />
+}
+
+function nameCell(params) {
+  return (
+    <Link component={RouterLink} to={`tareas/${params.row.id}/`} color="inherit">
+      {params.row.name}
+    </Link>
+  )
 }
 
 export default function Tasks(props) {
@@ -26,8 +35,10 @@ export default function Tasks(props) {
   const [page, setPage] = useState(1)
   const [query, setQuery] = useState()
 
+  const [auth] = useAuth()
+
   const columns = [
-    { field: "name", headerName: "Nombre", flex: 0.3 },
+    { field: "name", headerName: "Nombre", flex: 0.3, renderCell: nameCell },
     {
       field: "assignments",
       headerName: "Temas",
@@ -41,6 +52,7 @@ export default function Tasks(props) {
       flex: 0.1,
       sortable: false,
       renderCell: actionsCell,
+      groups: ["Docente"],
     },
   ]
 
@@ -82,7 +94,7 @@ export default function Tasks(props) {
     return (
       <>
         <IconButton
-          component={Link}
+          component={RouterLink}
           to={{ pathname: `/tareas/${params.row.id}/editar`, state: params.row }}
         >
           <Create />
@@ -99,7 +111,7 @@ export default function Tasks(props) {
   }, [page, query])
 
   return (
-    <div>
+    <Container>
       <Grid container>
         <Grid item xs={5}>
           <Typography variant="h5">Tareas</Typography>
@@ -120,7 +132,7 @@ export default function Tasks(props) {
               <Button
                 variant="contained"
                 startIcon={<Add />}
-                component={Link}
+                component={RouterLink}
                 to="tareas/crear"
                 disableElevation
               >
@@ -132,12 +144,12 @@ export default function Tasks(props) {
       </Grid>
 
       <DataTable
-        columns={columns}
+        columns={filterItemsByGroups(columns, auth.groups)}
         rows={data.results}
         rowCount={data.count}
         onPageChange={page => setPage(page + 1)}
         loading={loading}
       />
-    </div>
+    </Container>
   )
 }
