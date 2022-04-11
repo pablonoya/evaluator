@@ -69,10 +69,11 @@ export default function SubmissionQueue(props) {
 
   async function getSubmissions() {
     try {
-      const res = await submissionService.getAll()
-      if (res.status === 200) {
+      const { data, status } = await submissionService.getAll()
+
+      if (status === 200) {
         setMessages([])
-        setSubmissions(res.data)
+        setSubmissions(data.results)
         connectWebsocket()
       }
     } catch (err) {
@@ -111,8 +112,8 @@ export default function SubmissionQueue(props) {
       </Grid>
 
       <List>
-        {submissions.map((sub, i) => (
-          <ListItem key={i}>
+        {submissions.map(sub => (
+          <ListItem key={sub.id}>
             <SubmissionCard
               name={sub.exercise_name}
               date={sub.date}
