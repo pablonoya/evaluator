@@ -15,6 +15,7 @@ import SubmissionQueue from "../views/submissions/SubmissionQueue"
 import Students from "../views/students/Students"
 import Topics from "../views/topics/Topics"
 import Reports from "../views/reports/Reports"
+import ExercisesStudent from "../views/exercises/ExercisesStudent"
 
 export default function Routes(props) {
   const { showNotification } = props
@@ -32,6 +33,9 @@ export default function Routes(props) {
       </Route>
       <Route path="/tareas/:taskId/editar">
         <TaskForm showNotification={showNotification} />
+      </Route>
+      <Route path="/tareas/:taskId/">
+        <ExercisesStudent showNotification={showNotification} />
       </Route>
       <Route path="/tareas">
         <Tasks showNotification={showNotification} />
