@@ -17,6 +17,7 @@ router.register(r"topics", views.TopicView, "topic")
 router.register(r"assignments", views.AssignmentView, "assignment")
 router.register(r"users", views.UserView, "user")
 router.register(r"submissions", views.SubmissionView, "submission")
+router.register(r"practices", views.PracticeView, "practice")
 router.register(r"reports", views.ReportView, "reports")
 
 urlpatterns = [

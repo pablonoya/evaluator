@@ -43,7 +43,6 @@ def report_success(job, connection, result, *args, **kwargs):
 
 
 class ExerciseView(viewsets.ModelViewSet):
-    queryset = Exercise.objects.all()
     serializer_class = ExerciseSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -70,6 +69,7 @@ class ExerciseView(viewsets.ModelViewSet):
             fields=[
                 "id",
                 "name",
+                "topics",
                 "description",
                 "input_examples_min",
                 "output_examples_min",
@@ -79,13 +79,26 @@ class ExerciseView(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def list(self, request):
-        is_teacher = request.user.groups.filter(name="Docente")
+        is_teacher = request.user.groups.filter(name="Docente").exists()
 
         queryset = self.get_queryset()
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            args = {} if is_teacher else {"fields": ["id", "name", "topics"]}
+            args = (
+                {}
+                if is_teacher
+                else {
+                    "fields": [
+                        "id",
+                        "name",
+                        "description",
+                        "topics",
+                        "input_examples",
+                        "output_examples",
+                    ]
+                }
+            )
 
             serializer = self.get_serializer(page, many=True, **args)
             return self.get_paginated_response(serializer.data)
@@ -112,26 +125,6 @@ class ExerciseView(viewsets.ModelViewSet):
                 page, many=True, fields=["id", "name", "topics", "task"]
             )
             return self.get_paginated_response(serializer.data)
-
-    @action(detail=False, methods=["POST"], name="lottery")
-    def lottery(self, request, *args, **kwargs):
-        topic_ids = request.data["topic_ids"]
-        quantity = request.data["quantity"]
-
-        exercises = (
-            self.get_queryset()
-            .filter(task__isnull=True, topics__in=topic_ids)
-            .order_by("?")
-            .all()
-        )
-
-        if quantity is not None:
-            exercises = exercises[: int(quantity)]
-            exercises = sorted(exercises, key=lambda e: e.id)
-
-        serializer = self.get_serializer(exercises, many=True)
-
-        return Response(serializer.data, status=200)
 
     @action(detail=False, methods=["PUT"], name="update-task")
     def update_task(self, request, *args, **kwargs):

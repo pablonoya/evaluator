@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from django.contrib.auth.models import Group, User
 
 from rest_framework import viewsets, status
@@ -5,9 +6,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import filters
+from evaluator import serializers
 
-from evaluator.models import Submission
-from evaluator.serializers import UserSerializer, SubmissionSerializer
+
+from evaluator.models import Exercise, Practice, Submission, Task
+from evaluator.serializers import (
+    ExerciseSerializer,
+    UserSerializer,
+    SubmissionSerializer,
+)
 
 # Create your views here.
 class UserView(viewsets.ModelViewSet):
@@ -115,3 +122,34 @@ class SubmissionView(viewsets.ModelViewSet):
         serializer = SubmissionSerializer(submission)
 
         return Response(serializer.data)
+
+
+class PracticeView(viewsets.ModelViewSet):
+    serializer_class = ExerciseSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["exercise__name"]
+
+    def get_queryset(self):
+        task = self.request.query_params.get("taskId")
+        user = self.request.query_params.get("userId")
+
+        practice, created = Practice.objects.get_or_create(
+            task_id=task, student_id=user
+        )
+
+        # Assign exercises per topic
+        if created or not practice.exercises.exists():
+            assignments = Task.objects.get(id=task).assignment_set.all()
+
+            for assignment in assignments:
+                exercises = (
+                    Exercise.objects.filter(topics__in=[assignment.topic])
+                    .order_by("?")
+                    .distinct()
+                )[: assignment.exercises_number]
+
+                practice.exercises.add(*exercises)
+
+        queryset = practice.exercises.all()
+        return queryset
