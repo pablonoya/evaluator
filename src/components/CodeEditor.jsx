@@ -6,30 +6,20 @@ import "prismjs/components/prism-c"
 import "prismjs/components/prism-cpp"
 import "prismjs/themes/prism.css"
 
-import { useFormikContext } from "formik"
-import { useEffect } from "react"
-
 export default function CodeEditor(props) {
-  if (props.editable) {
-    const { setFieldValue } = useFormikContext()
-
-    useEffect(() => {
-      setFieldValue(props.value)
-    }, [])
-  }
-
   return (
     <Editor
       highlight={code => highlight(code, languages.cpp)}
+      autoFocus
       style={{
         fontFamily: '"Roboto Mono", monospace',
         fontSize: 16,
+        minHeight: "15em",
       }}
-      padding={8}
+      padding={12}
       {...props}
       onValueChange={code => {
         props.onValueChange(code)
-        setFieldValue("code", code)
       }}
     />
   )

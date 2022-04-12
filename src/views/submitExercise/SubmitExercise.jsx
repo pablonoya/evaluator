@@ -30,15 +30,21 @@ export default function SubmitExercise(props) {
     }
   }
 
-  function handleSubmit(values) {
-    exerciseService
-      .submit({ id: exerciseId, code: code })
-      .then(res => {
-        if (res.status === 200) {
-          showNotification("success", "Ejercicio enviado")
-        }
-      })
-      .catch(err => showNotification("error", err.toString()))
+  async function handleSubmit() {
+    if (!code) {
+      showNotification("warning", "Llena el código solución")
+      return
+    }
+
+    try {
+      const { status } = await exerciseService.submit({ id: exerciseId, code: code })
+
+      if (status === 200) {
+        showNotification("success", "Ejercicio enviado")
+      }
+    } catch (err) {
+      showNotification("error", err.toString())
+    }
   }
 
   useEffect(() => {
@@ -47,33 +53,35 @@ export default function SubmitExercise(props) {
 
   return (
     <Container>
-      <Formik onSubmit={handleSubmit}>
-        <Form>
-          <Grid container spacing={3}>
-            <Grid item xs={7}>
-              <Typography variant="h5">{exercise.name}</Typography>
-            </Grid>
-            <Grid item xs={5}>
-              <Grid container justifyContent="flex-end">
-                <Box sx={{ "& > button": { ml: 1, mr: "auto" } }}>
-                  <Button onClick={() => history.goBack()}>Cancelar</Button>
-                  <Button variant="contained" type="submit">
-                    Subir
-                  </Button>
-                </Box>
-              </Grid>
-            </Grid>
+      <Grid container spacing={4}>
+        <Grid item xs={7}>
+          <Typography variant="h5">{exercise.name}</Typography>
+        </Grid>
+        <Grid item xs={5}>
+          <Grid container justifyContent="flex-end">
+            <Box sx={{ "& > button": { ml: 1, mr: "auto" } }}>
+              <Button onClick={() => history.goBack()}>Cancelar</Button>
+              <Button variant="contained" onClick={() => handleSubmit()}>
+                Subir
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
 
-            <Grid item xs={6}>
-              <Typography variant="subtitle2">Descripción</Typography>
+        <Grid item xs={6}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="h6" paragraph>
+                Descripción
+              </Typography>
               <Typography variant="body1" paragraph>
                 {exercise.description}
               </Typography>
-
+            </Grid>
+            <Grid item xs={12}>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <TextField
-                    touched
                     multiline
                     label="Ejemplos de entrada"
                     value={exercise.input_examples_min}
@@ -83,7 +91,6 @@ export default function SubmitExercise(props) {
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
-                    touched
                     multiline
                     label="Ejemplos de salida"
                     value={exercise.output_examples_min}
@@ -93,26 +100,26 @@ export default function SubmitExercise(props) {
                 </Grid>
               </Grid>
             </Grid>
-
-            <Grid item xs={6}>
-              <Typography variant="h6" paragraph>
-                Código solución *
-              </Typography>
-
-              <Card variant="outlined">
-                <CodeEditor
-                  required
-                  error={code == ""}
-                  name="code"
-                  placeholder={"// Pega el código fuente aquí"}
-                  value={code}
-                  onValueChange={code => setCode(code)}
-                />
-              </Card>
-            </Grid>
           </Grid>
-        </Form>
-      </Formik>
+        </Grid>
+
+        <Grid item xs={6}>
+          <Typography variant="h6" paragraph>
+            Código solución
+          </Typography>
+
+          <Card variant="outlined">
+            <CodeEditor
+              required
+              name="code"
+              placeholder={"// Pega el código fuente aquí"}
+              value={code}
+              onValueChange={code => setCode(code)}
+              rows="10"
+            />
+          </Card>
+        </Grid>
+      </Grid>
     </Container>
   )
 }
