@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import filters
 
-from evaluator.models import Exercise, Submission
+from evaluator.models import Exercise, Practice, Submission
 from evaluator.serializers import ExerciseSerializer
 
 from evaluator.utils import (
@@ -50,13 +50,18 @@ class ExerciseView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Exercise.objects.all()
+
+        is_student = self.request.user.groups.filter(name="Alumnos").exists()
+        if is_student:
+            ids = Practice.objects.filter(student_id=self.request.user.id).values_list(
+                "exercises", flat=True
+            )
+            queryset = queryset.filter(id__in=ids).distinct()
+
         task = self.request.query_params.get("task")
-        ids = self.request.query_params.get("ids")
 
         if task:
             queryset = queryset.filter(task_id=int(task))
-        if ids:
-            queryset = queryset.filter(id__in=ids.split(","))
 
         queryset = self.filter_queryset(queryset)
 
@@ -83,24 +88,14 @@ class ExerciseView(viewsets.ModelViewSet):
 
         queryset = self.get_queryset()
 
+        fields = ["id", "name", "description", "topics"]
+
+        if is_teacher:
+            fields += ["description", "input_examples", "output_examples"]
+
         page = self.paginate_queryset(queryset)
         if page is not None:
-            args = (
-                {}
-                if is_teacher
-                else {
-                    "fields": [
-                        "id",
-                        "name",
-                        "description",
-                        "topics",
-                        "input_examples",
-                        "output_examples",
-                    ]
-                }
-            )
-
-            serializer = self.get_serializer(page, many=True, **args)
+            serializer = self.get_serializer(page, many=True, fields=fields)
             return self.get_paginated_response(serializer.data)
 
         return queryset
