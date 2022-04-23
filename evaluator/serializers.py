@@ -65,10 +65,20 @@ class TaskSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     groups = serializers.StringRelatedField(many=True, read_only=True)
     cu = serializers.CharField(source="student.cu")
+    phone = serializers.CharField(source="student.phone")
 
     class Meta:
         model = User
-        fields = ("id", "first_name", "last_name", "cu", "username", "email", "groups")
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "cu",
+            "username",
+            "phone",
+            "email",
+            "groups",
+        )
         read_only_field = ["id", "is_active", "created", "updated"]
 
     def create(self, validated_data):

@@ -18,11 +18,6 @@ function CustomToolbar() {
 export default function DataTable(props) {
   const { height, columns, rows, rowCount, onPageSizeChange, pageSize = 10, ...otherProps } = props
 
-  const onFilterChange = useCallback(filterModel => {
-    console.log(filterModel)
-    console.log(filterModel.items)
-  })
-
   return (
     <div style={{ width: "100%" }}>
       <DataGrid
@@ -35,7 +30,6 @@ export default function DataTable(props) {
         onPageSizeChange={onPageSizeChange}
         paginationMode="server"
         filterMode="server"
-        onFilterModelChange={onFilterChange}
         components={{
           Toolbar: CustomToolbar,
         }}

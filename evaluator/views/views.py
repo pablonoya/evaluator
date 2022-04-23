@@ -1,4 +1,3 @@
-from django.db.models import Sum
 from django.contrib.auth.models import Group, User
 
 from rest_framework import viewsets, status
@@ -6,8 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import filters
-from evaluator import serializers
 
+import pandas as pd
 
 from evaluator.models import Exercise, Practice, Submission, Task
 from evaluator.serializers import (
@@ -24,15 +23,11 @@ class UserView(viewsets.ModelViewSet):
     search_fields = ["first_name", "last_name", "username", "student__cu"]
 
     def get_queryset(self):
-        studentGroup = Group.objects.filter(name="Alumnos").first()
+        students_group = Group.objects.filter(name="Alumnos").first()
 
         return User.objects.filter(
-            is_superuser=False, is_active=True, groups__in=[studentGroup.id]
+            is_superuser=False, is_active=True, groups__in=[students_group.id]
         )
-
-    def perform_destroy(self, instance):
-        instance.is_active = False
-        instance.save()
 
     @action(methods=["GET"], detail=False, name="myself")
     def myself(self, request, *args, **kwargs):
@@ -77,6 +72,48 @@ class UserView(viewsets.ModelViewSet):
 
         user.save()
         return Response("Perfil actualizado")
+
+    @action(methods=["POST"], detail=False, name="upload")
+    def upload(self, request):
+        file = request.data.get("file")
+        if file is None:
+            raise Exception("No se envió ningún archivo")
+
+        students_group = Group.objects.filter(name="Alumnos").first()
+        df = pd.read_excel(file, header=8)
+        names = df["APELLIDOS PATERNO MATERNO, NOMBRES"].dropna()
+
+        users = []
+
+        for info in names:
+            fullname, phone = info.split("(")
+
+            # Encoding-decoding recovers latin characters
+            paternal_last_name, maternal_last_name, *names = (
+                fullname.encode("latin1").decode().split(" ")
+            )
+
+            last_name = f"{paternal_last_name} {maternal_last_name}".strip()
+            first_name = " ".join(names).strip()
+
+            user, _ = User.objects.update_or_create(
+                first_name=first_name,
+                last_name=last_name,
+                defaults={
+                    "username": (names[0] + paternal_last_name).lower(),
+                    "is_active": True,
+                },
+            )
+            user.groups.add(students_group)
+            user.student.phone = phone.split(")")[0]
+            user.student.save()
+
+            users.append(user)
+
+        serializer = UserSerializer(users, many=True)
+        return Response(
+            {"message": "File processed", "users": serializer.data}, status=201
+        )
 
 
 class SubmissionView(viewsets.ModelViewSet):
