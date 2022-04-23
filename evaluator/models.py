@@ -77,6 +77,7 @@ class Submission(models.Model):
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     cu = models.CharField(max_length=10)
+    phone = models.CharField(max_length=20, blank=True)
 
 
 @receiver(post_save, sender=User)
