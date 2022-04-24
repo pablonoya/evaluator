@@ -13,6 +13,10 @@ const apiInstance = axios.create(
 )
 
 apiInstance.interceptors.response.use(null, error => {
+  if (error.config.url == "/evaluator/api/token/") {
+    return Promise.reject(error)
+  }
+
   if (error.config.url == "/evaluator/api/token/refresh/") {
     window.location.href = "/login/"
     return Promise.reject(error)

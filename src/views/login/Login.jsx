@@ -1,13 +1,38 @@
-import { Button, Container, Grid } from "@mui/material"
+import { useState } from "react"
+import { Alert, Avatar, Button, Collapse, Container, IconButton, Typography } from "@mui/material"
+import { AccountCircle, Close } from "@mui/icons-material"
+import { makeStyles } from "@material-ui/core/styles"
+import { Box } from "@mui/system"
 import { Form, Formik } from "formik"
 import { useAuth } from "../../contexts/authContext"
 
-import TextFieldForm from "../../components/TextFieldForm"
-import authService from "../../services/authService"
 import http from "../../services/http-common"
+import authService from "../../services/authService"
+
+import PasswordFieldForm from "../../components/PaswordFieldForm"
+import TextFieldForm from "../../components/TextFieldForm"
+
+const useStyles = makeStyles(theme => ({
+  paper: {
+    marginTop: theme.spacing(8),
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.primary.light,
+  },
+  submit: {
+    margin: theme.spacing(2, 0, 2),
+  },
+}))
 
 export default function Login(props) {
+  const classes = useStyles()
   const [auth, handleAuth] = useAuth()
+
+  const [open, setOpen] = useState(false)
 
   async function handleSubmit(values) {
     try {
@@ -26,31 +51,59 @@ export default function Login(props) {
         handleAuth(data)
       }
     } catch (err) {
-      console.error(err)
+      setOpen(true)
     }
   }
 
   return (
-    <Container sx={{ mt: 5 }}>
-      <Formik initialValues={{ username: "", password: "" }} onSubmit={handleSubmit}>
-        <Form>
-          <Container>
-            <Grid container spacing={2}>
-              <Grid item xs={7}>
-                <TextFieldForm label="usuario" name="username" />
-              </Grid>
-              <Grid item xs={7}>
-                <TextFieldForm label="contraseña" name="password" type="password" />
-              </Grid>
-              <Grid item xs={7}>
-                <Button variant="contained" type="submit">
-                  Ingresar
-                </Button>
-              </Grid>
-            </Grid>
-          </Container>
-        </Form>
-      </Formik>
+    <Container component="main" maxWidth="sm">
+      <Container>
+        <div className={classes.paper}>
+          <Avatar className={classes.avatar}>
+            <AccountCircle />
+          </Avatar>
+          <Typography component="h1" variant="h5" paragraph>
+            ¡Bienvenido al Evaluador!
+          </Typography>
+
+          <Box sx={{ width: "100%" }}>
+            <Collapse in={open}>
+              <Alert
+                severity="warning"
+                action={
+                  <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => setOpen(false)}
+                  >
+                    <Close fontSize="inherit" />
+                  </IconButton>
+                }
+                sx={{ mb: 2 }}
+              >
+                Usuario o contraseña incorrectos
+              </Alert>
+            </Collapse>
+          </Box>
+
+          <Formik initialValues={{ username: "", password: "" }} onSubmit={handleSubmit}>
+            <Form>
+              <TextFieldForm
+                label="Usuario, email o celular"
+                name="username"
+                margin="normal"
+                autoFocus
+                required
+              />
+              <PasswordFieldForm label="Contraseña" name="password" margin="normal" required />
+              <Button variant="contained" type="submit" className={classes.submit} fullWidth>
+                Ingresar
+              </Button>
+            </Form>
+          </Formik>
+        </div>
+      </Container>
     </Container>
   )
 }
