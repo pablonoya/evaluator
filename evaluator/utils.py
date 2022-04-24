@@ -11,7 +11,7 @@ from channels.layers import get_channel_layer
 from evaluator.models import Exercise, Submission
 
 # Statuses
-FAILED = 0
+COMPILATION_ERROR = 0
 REVIEW = 2
 TLE = 3
 ACCEPTED = 4
@@ -31,7 +31,7 @@ def code_runner(source_code, exercise_id, user_id, timelimit="1s"):
         asyncio.run(
             send_websocket_message("Fallido", exercise.id, user_id, exercise.name)
         )
-        return FAILED
+        return COMPILATION_ERROR
 
     # Review exercise
     Submission.objects.update_or_create(

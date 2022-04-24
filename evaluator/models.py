@@ -46,7 +46,7 @@ class Exercise(models.Model):
 
 class Submission(models.Model):
     class Status(models.IntegerChoices):
-        FAILED = 0
+        COMPILATION_ERROR = 0
         QUEUED = 1
         REVIEW = 2
         TLE = 3
@@ -64,7 +64,7 @@ class Submission(models.Model):
 
     def status_name(self):
         statuses = [
-            "Fallido",
+            "Error de compilación",
             "En cola",
             "En revisión",
             "Tiempo Límite Excedido",
