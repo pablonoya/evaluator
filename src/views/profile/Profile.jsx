@@ -1,15 +1,12 @@
-import { useState } from "react"
-
-import { Button, Container, Grid, IconButton, InputAdornment, Typography } from "@mui/material"
-import { Visibility, VisibilityOff } from "@mui/icons-material"
-
+import { Button, Container, Grid, Typography } from "@mui/material"
 import { Formik, Form } from "formik"
+import { useAuth } from "../../contexts/authContext"
+import { useHistory } from "react-router-dom"
+
+import authService from "../../services/authService"
 
 import TextFieldForm from "../../components/TextFieldForm"
-
-import { useAuth } from "../../contexts/authContext"
-import authService from "../../services/authService"
-import { useHistory } from "react-router-dom"
+import PasswordFieldForm from "../../components/PaswordFieldForm"
 
 export default function Profile(props) {
   const { showNotification } = props
@@ -18,16 +15,10 @@ export default function Profile(props) {
   const [auth, handleAuth] = useAuth()
 
   const initialValues = {
-    first_name: auth.first_name,
-    last_name: auth.last_name,
-    username: auth.username,
-    cu: auth.cu,
+    ...auth,
     password: "",
     new_password: "",
   }
-
-  const [showPassword, setShowPassword] = useState(false)
-  const [userInfo, setUserInfo] = useState(initialValues)
 
   async function updateProfile(profileData) {
     try {
@@ -35,22 +26,21 @@ export default function Profile(props) {
 
       if (res.status === 200) {
         showNotification("success", "Perfil actualizado")
-        history.goBack()
+
+        const { data } = await authService.myself()
+        handleAuth(data)
       }
     } catch (err) {
       showNotification("error", err.response.data.toString())
     }
   }
 
-  function handleShow() {
-    setShowPassword(!showPassword)
-  }
   function handleSubmit(values) {
     updateProfile(values)
   }
 
   return (
-    <Container>
+    <Container maxWidth="sm">
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <Typography variant="h5" paragraph>
@@ -59,63 +49,27 @@ export default function Profile(props) {
         </Grid>
       </Grid>
 
-      <Formik initialValues={userInfo} onSubmit={handleSubmit} enableReinitialize>
+      <Formik initialValues={initialValues} onSubmit={handleSubmit} enableReinitialize>
         <Form>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextFieldForm name="cu" label="Carnet universitario" required />
-            </Grid>
-            <Grid item xs={6}>
-              <TextFieldForm name="username" label="Nombre de usuario" required />
-            </Grid>
-            <Grid item xs={6}>
-              <TextFieldForm name="first_name" label="Nombre(s)" required />
-            </Grid>
-            <Grid item xs={6}>
-              <TextFieldForm name="last_name" label="Apellido(s)" required />
-            </Grid>
-            <Grid item xs={12}>
-              <TextFieldForm
-                name="password"
-                label="Contraseña actual"
-                required
-                type={showPassword ? "text" : "password"}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={handleShow} edge="end">
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextFieldForm
-                name="new_password"
-                label="Nueva contraseña"
-                type={showPassword ? "text" : "password"}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={handleShow} edge="end">
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
+          <TextFieldForm name="last_name" label="Apellido(s)" margin="dense" required />
+          <TextFieldForm name="first_name" label="Nombre(s)" margin="dense" required />
+          <TextFieldForm name="cu" label="Carnet universitario" margin="dense" required />
+          <TextFieldForm name="username" label="Nombre de usuario" margin="dense" required />
+          <TextFieldForm name="phone" label="Celular" margin="dense" />
+          <TextFieldForm name="email" label="Email" margin="dense" />
 
-            <Grid item xs={12}>
-              <Grid container justifyContent="end">
-                <Button variant="contained" type="submit">
-                  Guardar cambios
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
+          <PasswordFieldForm
+            name="password"
+            label="Contraseña actual"
+            margin="dense"
+            sx={{ marginTop: 3 }}
+            required
+          />
+          <PasswordFieldForm name="new_password" label="Nueva contraseña" margin="dense" />
+
+          <Button variant="contained" type="submit" sx={{ marginTop: 2 }} fullWidth>
+            Guardar cambios
+          </Button>
         </Form>
       </Formik>
     </Container>
