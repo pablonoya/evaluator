@@ -128,7 +128,9 @@ class SubmissionView(viewsets.ModelViewSet):
         queryset = Submission.objects.all()
 
         if student_group in user.groups.all():
-            queryset = queryset.filter(user=self.request.user.id)
+            queryset = queryset.filter(user=self.request.user.id).order_by(
+                "-evaluated_at"
+            )
 
         return self.filter_queryset(queryset)
 
