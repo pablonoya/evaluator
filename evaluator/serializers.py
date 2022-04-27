@@ -65,7 +65,7 @@ class TaskSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     groups = serializers.StringRelatedField(many=True, read_only=True)
     cu = serializers.CharField(source="student.cu")
-    phone = serializers.CharField(source="student.phone")
+    phone = serializers.CharField(source="student.phone", allow_blank=True)
 
     class Meta:
         model = User
@@ -82,19 +82,25 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_field = ["id", "is_active", "created", "updated"]
 
     def create(self, validated_data):
-        cu = validated_data.pop("student").get("cu")
         group = Group.objects.get(name=self.initial_data["group"])
+
+        cu = validated_data.pop("student").get("cu")
+        phone = validated_data.pop("student").get("phone")
 
         user = User.objects.create(**validated_data)
         user.groups.add(group)
 
         user.student.cu = cu
+        user.student.phone = phone
         user.student.save()
 
         return user
 
     def update(self, instance, validated_data):
-        instance.student.cu = validated_data.pop("student").get("cu")
+        student_data = validated_data.pop("student")
+
+        for (key, value) in student_data.items():
+            setattr(instance.student, key, value)
 
         for (key, value) in validated_data.items():
             setattr(instance, key, value)

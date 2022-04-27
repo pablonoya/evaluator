@@ -58,26 +58,29 @@ export default function FormDialog(props) {
             <DialogContentText>Ingrese los datos del estudiante.</DialogContentText>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <TextFieldForm name="first_name" label="Nombres" required />
-              </Grid>
-              <Grid item xs={12}>
                 <TextFieldForm name="last_name" label="Apellidos" required />
               </Grid>
-
-              <Grid item xs={6}>
-                <TextFieldForm name="username" label="Nombre de usuario" required />
-              </Grid>
-              <Grid item xs={6}>
-                <TextFieldForm name="email" label="Email" required />
-              </Grid>
-
               <Grid item xs={12}>
+                <TextFieldForm name="first_name" label="Nombres" required />
+              </Grid>
+
+              <Grid item xs={6}>
                 <TextFieldForm
                   name="cu"
                   label="Carnet universitario"
                   inputProps={{ maxLength: 10 }}
                   required
                 />
+              </Grid>
+              <Grid item xs={6}>
+                <TextFieldForm name="phone" label="Celular" inputProps={{ maxLength: 10 }} />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextFieldForm name="username" label="Nombre de usuario" required />
+              </Grid>
+              <Grid item xs={6}>
+                <TextFieldForm name="email" label="Email" />
               </Grid>
             </Grid>
           </DialogContent>
