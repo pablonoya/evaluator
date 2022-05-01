@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useHistory, useParams } from "react-router"
+import { useNavigate, useParams } from "react-router"
 
 import { Formik, Form } from "formik"
 
@@ -32,7 +32,7 @@ export default function TaskForm(props) {
   const { showNotification } = props
 
   const { taskId } = useParams()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const [taskData, setTaskData] = useState({ name: "" })
   const [assignments, setAssignments] = useState([])
@@ -132,7 +132,7 @@ export default function TaskForm(props) {
           showNotification("success", `Tarea ${values.name} creada`)
         }
       }
-      history.push("/tareas")
+      navigate("/tareas")
     } catch (err) {
       showNotification("error", err.toString())
     }
@@ -212,7 +212,7 @@ export default function TaskForm(props) {
 
             <Grid container justifyContent="end">
               <Box sx={{ "& > button": { ml: 1, my: 1 } }}>
-                <Button onClick={() => history.push("/tareas")}>Cancelar</Button>
+                <Button onClick={() => navigate("/tareas")}>Cancelar</Button>
                 <Button variant="contained" type="submit">
                   {editing ? "Guardar" : "Crear"}
                 </Button>

@@ -1,42 +1,38 @@
 import { Suspense, lazy } from "react"
-import { Route, Redirect, Switch } from "react-router-dom"
+import { Routes, Route, Navigate, useLocation } from "react-router-dom"
+
+import Loading from "./components/Loading"
+import Login from "./views/login/Login"
+const Navigation = lazy(() => import("./components/Navigation.jsx"))
 
 import { useAuth } from "./contexts/authContext"
-import Loading from "./components/Loading"
-
-const Login = lazy(() => import("./views/login/Login.jsx"))
-const Navigation = lazy(() => import("./components/Navigation.jsx"))
 
 function App() {
   return (
-    <Switch>
-      <Route path="/login">
-        <Suspense fallback={<Loading />}>
-          <Login />
-        </Suspense>
-      </Route>
-      <PrivateRoute path="/">
-        <Navigation />
-      </PrivateRoute>
-    </Switch>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="*"
+        element={
+          <RequireAuth>
+            <Suspense fallback={<Loading />}>
+              <Navigation />
+            </Suspense>
+          </RequireAuth>
+        }
+      />
+    </Routes>
   )
 }
 
-function PrivateRoute({ children, ...rest }) {
-  const [auth] = useAuth(useAuth)
+function RequireAuth({ children }) {
+  const [auth, _] = useAuth(useAuth)
+  const location = useLocation()
 
-  return (
-    <Route
-      render={() => {
-        return auth ? (
-          <Suspense fallback={<Loading />}>{children}</Suspense>
-        ) : (
-          <Redirect push to="/login" />
-        )
-      }}
-      {...rest}
-    />
-  )
+  if (!auth) {
+    return <Navigate to="/login" state={{ from: location }} replace />
+  }
+  return children
 }
 
 export default App

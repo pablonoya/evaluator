@@ -14,7 +14,14 @@ export default defineConfig({
       input: "./src/main.jsx",
     },
   },
-  // base: process.env === "production" ? "/static/" : "/",
+  resolve: {
+    alias: [
+      {
+        find: /^@mui\/icons-material\/(.*)/,
+        replacement: "@mui/icons-material/esm/$1",
+      },
+    ],
+  },
   root: "./src",
   plugins: [react()],
 })

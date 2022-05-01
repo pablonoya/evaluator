@@ -1,19 +1,17 @@
 import { useEffect, useState } from "react"
 import { useParams } from "react-router"
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
-import { Formik, Form } from "formik"
 import { Grid, Box, Card, TextField, Typography, Button, Container } from "@mui/material"
 
 import exerciseService from "../../services/exerciseService"
 import CodeEditor from "../../components/CodeEditor"
-import TextFieldForm from "../../components/TextFieldForm"
 
 export default function SubmitExercise(props) {
   const { showNotification } = props
 
   const { exerciseId } = useParams()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const [code, setCode] = useState("")
   const [exercise, setExercise] = useState({
@@ -60,7 +58,7 @@ export default function SubmitExercise(props) {
         <Grid item xs={5}>
           <Grid container justifyContent="flex-end">
             <Box sx={{ "& > button": { ml: 1, mr: "auto" } }}>
-              <Button onClick={() => history.goBack()}>Cancelar</Button>
+              <Button onClick={() => navigate(-1)}>Cancelar</Button>
               <Button variant="contained" onClick={() => handleSubmit()}>
                 Subir
               </Button>

@@ -4,7 +4,7 @@ import { AppBar, IconButton, Menu, MenuItem, Toolbar, Typography } from "@mui/ma
 import MenuIcon from "@mui/icons-material/Menu"
 import { AccountCircle } from "@mui/icons-material"
 
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 import { useAuth } from "../contexts/authContext"
 
@@ -13,14 +13,14 @@ export default function Header(props) {
 
   const [auth, handleAuth] = useAuth()
   const [anchorEl, setAnchorEl] = useState(null)
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const handleClose = () => {
     setAnchorEl(null)
   }
 
   const handleProfile = () => {
-    history.push("/perfil")
+    navigate("/perfil")
     handleClose()
   }
 

@@ -1,7 +1,6 @@
 import { Button, Container, Grid, Typography } from "@mui/material"
 import { Formik, Form } from "formik"
 import { useAuth } from "../../contexts/authContext"
-import { useHistory } from "react-router-dom"
 
 import authService from "../../services/authService"
 
@@ -11,7 +10,6 @@ import PasswordFieldForm from "../../components/PaswordFieldForm"
 export default function Profile(props) {
   const { showNotification } = props
 
-  const history = useHistory()
   const [auth, handleAuth] = useAuth()
 
   const initialValues = {

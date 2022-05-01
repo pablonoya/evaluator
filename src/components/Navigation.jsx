@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState } from "react"
 
 import Box from "@mui/system/Box"
 import Toolbar from "@mui/material/Toolbar"
@@ -20,8 +20,9 @@ const theme = createTheme(
 
 import Header from "./Header"
 import Navbar from "./Navbar"
-import Routes from "../routes/Routes"
 import Notification from "./Notification"
+
+import RoutesList from "../routes/RoutesList"
 
 const drawerWidth = 240
 
@@ -59,7 +60,7 @@ export default function Navigation(props) {
         />
         <Box component="main" sx={{ flexGrow: 1, p: 4 }}>
           <Toolbar />
-          <Routes showNotification={showNotification} />
+          <RoutesList showNotification={showNotification} />
         </Box>
 
         <Notification
