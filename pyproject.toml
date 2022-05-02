@@ -20,6 +20,7 @@ factory-boy = "^3.2.1"
 django-vite = "^2.0.2"
 pandas = "^1.4.2"
 xlrd = "^2.0.1"
+yagmail = "^0.15.277"
 
 [tool.poetry.dev-dependencies]
 
