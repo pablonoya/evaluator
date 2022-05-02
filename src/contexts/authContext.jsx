@@ -13,6 +13,11 @@ const AuthProvider = props => {
   const from = location.state?.from?.pathname || "/"
 
   useEffect(() => {
+    if (location.pathname === "/restablecer") {
+      handleAuth(false)
+      return
+    }
+
     if (localStorage.getItem("refreshToken")) {
       authService
         .myself()

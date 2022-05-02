@@ -6,14 +6,21 @@ const apiInstance = axios.create(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": getCookie("csrftoken"),
-      Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      Authorization:
+        localStorage.getItem("accessToken") && "Bearer " + localStorage.getItem("accessToken"),
     },
   },
   error => Promise.reject(error)
 )
 
 apiInstance.interceptors.response.use(null, error => {
-  if (error.config.url == "/evaluator/api/token/") {
+  if (
+    [
+      "/evaluator/api/token/",
+      "/evaluator/api/users/change_password/",
+      "/evaluator/api/users/search/",
+    ].includes(error.config.url)
+  ) {
     return Promise.reject(error)
   }
 

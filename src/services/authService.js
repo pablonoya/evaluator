@@ -1,8 +1,25 @@
 import http from "./http-common"
 
+const noAuthHeader = {
+  headers: {
+    Authorization: null,
+  },
+}
 class AuthService {
   constructor() {
     this.url = "/evaluator/api"
+  }
+
+  search(username) {
+    return http.post(`${this.url}/users/search/`, { username: username }, noAuthHeader)
+  }
+
+  recoverPassword(body) {
+    return http.post(`${this.url}/users/recover_password/`, body, noAuthHeader)
+  }
+
+  changePassword(password) {
+    return http.put(`${this.url}/users/change_password/`, { password: password })
   }
 
   login(data) {

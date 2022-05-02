@@ -1,9 +1,12 @@
 import { useState } from "react"
-import { Alert, Avatar, Button, Collapse, Container, IconButton, Typography } from "@mui/material"
+
+import { Alert, Avatar, Box, Collapse, Container, Link, IconButton, Typography } from "@mui/material"
 import { AccountCircle, Close } from "@mui/icons-material"
-import { makeStyles } from "@material-ui/core/styles"
-import { Box } from "@mui/system"
+import { LoadingButton } from "@mui/lab"
+
 import { Form, Formik } from "formik"
+import { Link as RouterLink } from "react-router-dom"
+
 import { useAuth } from "../../contexts/authContext"
 
 import http from "../../services/http-common"
@@ -12,29 +15,14 @@ import authService from "../../services/authService"
 import PasswordFieldForm from "../../components/PaswordFieldForm"
 import TextFieldForm from "../../components/TextFieldForm"
 
-const useStyles = makeStyles(theme => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.primary.light,
-  },
-  submit: {
-    margin: theme.spacing(2, 0, 2),
-  },
-}))
-
-export default function Login(props) {
-  const classes = useStyles()
-  const [auth, handleAuth] = useAuth()
+export default function Login() {
+  const [_, handleAuth] = useAuth()
 
   const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(values) {
+    setLoading(true)
     try {
       const res = await authService.login({
         username: values.username,
@@ -52,58 +40,74 @@ export default function Login(props) {
       }
     } catch (err) {
       setOpen(true)
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
     <Container component="main" maxWidth="sm">
-      <Container>
-        <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <AccountCircle />
-          </Avatar>
-          <Typography component="h1" variant="h5" paragraph>
-            ¡Bienvenido al Evaluador!
-          </Typography>
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Avatar sx={{ m: 1, bgcolor: "primary.light", width: 56, height: 56 }}>
+          <AccountCircle fontSize="large" />
+        </Avatar>
+        <Typography component="h1" variant="h5" paragraph>
+          ¡Bienvenido al Evaluador!
+        </Typography>
 
-          <Box sx={{ width: "100%" }}>
-            <Collapse in={open}>
-              <Alert
-                severity="warning"
-                action={
-                  <IconButton
-                    aria-label="close"
-                    color="inherit"
-                    size="small"
-                    onClick={() => setOpen(false)}
-                  >
-                    <Close fontSize="inherit" />
-                  </IconButton>
-                }
-                sx={{ mb: 2 }}
-              >
-                Usuario o contraseña incorrectos
-              </Alert>
-            </Collapse>
-          </Box>
+        <Box sx={{ width: "100%" }}>
+          <Collapse in={open}>
+            <Alert
+              sx={{ mb: 2 }}
+              severity="warning"
+              action={
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={() => setOpen(false)}
+                >
+                  <Close fontSize="inherit" />
+                </IconButton>
+              }
+            >
+              Usuario o contraseña incorrectos
+            </Alert>
+          </Collapse>
+        </Box>
 
-          <Formik initialValues={{ username: "", password: "" }} onSubmit={handleSubmit}>
-            <Form>
-              <TextFieldForm
-                label="Usuario, email o celular"
-                name="username"
-                margin="normal"
-                autoFocus
-                required
-              />
-              <PasswordFieldForm label="Contraseña" name="password" margin="normal" required />
-              <Button variant="contained" type="submit" className={classes.submit} fullWidth>
-                Ingresar
-              </Button>
-            </Form>
-          </Formik>
-        </div>
-      </Container>
+        <Formik initialValues={{ username: "", password: "" }} onSubmit={handleSubmit}>
+          <Form>
+            <TextFieldForm
+              label="Usuario, email o celular"
+              name="username"
+              margin="normal"
+              autoFocus
+              required
+            />
+            <PasswordFieldForm label="Contraseña" name="password" margin="normal" required />
+            <LoadingButton
+              sx={{ mt: 2, mb: 3 }}
+              variant="contained"
+              type="submit"
+              loading={loading}
+              fullWidth
+            >
+              Ingresar
+            </LoadingButton>
+            <Link component={RouterLink} to="/recuperar">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </Form>
+        </Formik>
+      </Box>
     </Container>
   )
 }
