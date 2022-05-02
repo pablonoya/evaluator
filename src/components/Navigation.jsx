@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-import { Box, Toolbar } from "@mui/material/Toolbar"
+import { Box, Toolbar } from "@mui/material"
 
 import Header from "./Header"
 import Navbar from "./Navbar"
