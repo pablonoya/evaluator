@@ -1,22 +1,6 @@
 import { useState } from "react"
 
-import Box from "@mui/system/Box"
-import Toolbar from "@mui/material/Toolbar"
-
-import CssBaseline from "@mui/material/CssBaseline"
-import { createTheme, ThemeProvider } from "@mui/material/styles"
-import { esES as coreES } from "@mui/material/locale"
-import { esES } from "@mui/x-data-grid"
-
-const theme = createTheme(
-  {
-    palette: {
-      primary: { main: "#1976d2" },
-    },
-  },
-  esES,
-  coreES
-)
+import { Box, Toolbar } from "@mui/material/Toolbar"
 
 import Header from "./Header"
 import Navbar from "./Navbar"
@@ -48,28 +32,21 @@ export default function Navigation(props) {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <Box sx={{ display: "flex" }}>
-        <CssBaseline />
-        <Header drawerWidth={drawerWidth} handleOpen={handleOpen} />
-        <Navbar
-          container={container}
-          drawerWidth={drawerWidth}
-          open={open}
-          handleOpen={handleOpen}
-        />
-        <Box component="main" sx={{ flexGrow: 1, p: 4 }}>
-          <Toolbar />
-          <RoutesList showNotification={showNotification} />
-        </Box>
+    <Box sx={{ display: "flex" }}>
+      <Header drawerWidth={drawerWidth} handleOpen={handleOpen} />
+      <Navbar container={container} drawerWidth={drawerWidth} open={open} handleOpen={handleOpen} />
 
-        <Notification
-          notificationOpen={notificationOpen}
-          handleClose={() => setNotificationOpen(false)}
-          notificationMessage={notificationMessage}
-          severity={severity}
-        />
+      <Box component="main" sx={{ flexGrow: 1, p: 4 }}>
+        <Toolbar />
+        <RoutesList showNotification={showNotification} />
       </Box>
-    </ThemeProvider>
+
+      <Notification
+        notificationOpen={notificationOpen}
+        handleClose={() => setNotificationOpen(false)}
+        notificationMessage={notificationMessage}
+        severity={severity}
+      />
+    </Box>
   )
 }
