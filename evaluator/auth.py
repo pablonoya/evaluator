@@ -6,7 +6,6 @@ User = get_user_model()
 
 class AuthBackend:
     def authenticate(self, request, username=None, password=None, **kwargs):
-        print("trying", username, password)
         try:
             # Try to fetch the user by searching the username or email field
             user = User.objects.get(

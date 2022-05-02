@@ -1,11 +1,17 @@
 import pandas as pd
+import yagmail
 
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import Group, User
+from django.template.loader import render_to_string
 
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from evaluator.serializers import UserSerializer
 
@@ -23,6 +29,58 @@ class UserView(viewsets.ModelViewSet):
             is_superuser=False, is_active=True, groups__in=[students_group.id]
         )
 
+    @action(methods=["POST"], detail=False, name="search", permission_classes=[])
+    def search(self, request):
+        username = request.data.get("username")
+
+        user = get_object_or_404(
+            User, Q(username=username) | Q(email=username) | Q(student__phone=username)
+        )
+
+        if user.email:
+            email = censor_email(user.email)
+            return Response({"email": email})
+
+        return Response({"email": None}, status=404)
+
+    @action(
+        methods=["POST"], detail=False, name="recover_password", permission_classes=[]
+    )
+    def recover_password(self, request):
+        username = request.data.get("username")
+
+        user = get_object_or_404(
+            User, Q(username=username) | Q(email=username) | Q(student__phone=username)
+        )
+
+        email = request.data.get("email") or user.email
+
+        try:
+            yag = yagmail.SMTP(
+                "evaluador.usfx@gmail.com", oauth2_file="./oauth2_creds.json"
+            )
+            token = RefreshToken.for_user(user).access_token
+
+            contents = render_to_string(
+                "password_recovery.html",
+                context={
+                    "name": user.first_name or user.last_name or user.username,
+                    "token": str(token),
+                },
+            ).replace("\n", "")
+
+            yag.send(
+                to=email,
+                subject="Restablecer contraseña",
+                contents=contents,
+                prettify_html=False,
+            )
+
+        except Exception as e:
+            print(e)
+
+        return Response({"detail": "Email sent"})
+
     @action(methods=["GET"], detail=False, name="myself")
     def myself(self, request, *args, **kwargs):
         user = request.user
@@ -31,13 +89,22 @@ class UserView(viewsets.ModelViewSet):
 
     @action(methods=["GET"], detail=True, name="generate-password")
     def generate_password(self, request, pk=None, *args, **kwargs):
+        user = self.get_queryset().get(id=pk)
         password = User.objects.make_random_password()
 
-        user = self.get_queryset().get(id=pk)
         user.set_password(password)
+        user.save()
+
+        return Response("password", status=200)
+
+    @action(methods=["PUT"], detail=False, name="change_password")
+    def change_password(self, request, *args, **kwargs):
+        user = request.user
+
+        user.set_password(request.data.get("password"))
         user.save(update_fields=["password"])
 
-        return Response(password, status=200)
+        return Response({"message": "Contraseña actualizada"}, status=200)
 
     @action(methods=["POST"], detail=False, name="update-profile")
     def update_profile(self, request, *args, **kwargs):
@@ -112,3 +179,13 @@ class UserView(viewsets.ModelViewSet):
         return Response(
             {"message": "File processed", "users": serializer.data}, status=201
         )
+
+
+def censor_email(email):
+    address, domain = email.split("@")
+    address_length = len(address)
+
+    if address_length <= 3:
+        return "*" * address_length + f"@{domain}"
+
+    return address[:3] + "*" * (address_length - 3) + f"@{domain}"
