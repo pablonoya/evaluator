@@ -35,15 +35,14 @@ export default function FormDialog(props) {
           showNotification("success", `Estudiante ${values.first_name} creado`)
           getStudents()
 
-          console.log(res.data)
           setUserId(res.data.id)
           setOpenPasswordDialog(true)
         }
       }
+
+      handleClose()
     } catch (err) {
       showNotification("error", err.toString())
-    } finally {
-      handleClose()
     }
   }
 

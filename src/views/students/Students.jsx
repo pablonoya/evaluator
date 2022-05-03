@@ -19,7 +19,7 @@ export default function Students(props) {
   const [data, setData] = useState({ results: [], count: 0 })
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(5)
+  const [pageSize, setPageSize] = useState(10)
 
   const [open, setOpen] = useState(false)
   const [openUpload, setOpenUpload] = useState(false)
