@@ -78,7 +78,7 @@ export default function Recover() {
   async function handleSubmit(values) {
     const { username, email } = values
 
-    if (!!username && !!email) {
+    if (!!username && email !== "") {
       recoverPassword(username, email)
       return
     }
@@ -97,8 +97,6 @@ export default function Recover() {
         )
         setOpenAlert(true)
         setShowEmailInput(false)
-
-        recoverPassword(username)
       }
     } catch (err) {
       setOpenAlert(true)

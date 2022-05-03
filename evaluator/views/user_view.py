@@ -38,8 +38,8 @@ class UserView(viewsets.ModelViewSet):
         )
 
         if user.email:
-            email = censor_email(user.email)
-            return Response({"email": email})
+            send_email(user, user.email)
+            return Response({"email": censor_email(user.email)})
 
         return Response({"email": None}, status=404)
 
@@ -53,31 +53,8 @@ class UserView(viewsets.ModelViewSet):
             User, Q(username=username) | Q(email=username) | Q(student__phone=username)
         )
 
-        email = request.data.get("email") or user.email
-
-        try:
-            yag = yagmail.SMTP(
-                "evaluador.usfx@gmail.com", oauth2_file="./oauth2_creds.json"
-            )
-            token = RefreshToken.for_user(user).access_token
-
-            contents = render_to_string(
-                "password_recovery.html",
-                context={
-                    "name": user.first_name or user.last_name or user.username,
-                    "token": str(token),
-                },
-            ).replace("\n", "")
-
-            yag.send(
-                to=email,
-                subject="Restablecer contraseña",
-                contents=contents,
-                prettify_html=False,
-            )
-
-        except Exception as e:
-            print(e)
+        receiver = request.data.get("email") or user.email
+        send_email(user, receiver)
 
         return Response({"detail": "Email sent"})
 
@@ -95,7 +72,7 @@ class UserView(viewsets.ModelViewSet):
         user.set_password(password)
         user.save()
 
-        return Response("password", status=200)
+        return Response(password, status=200)
 
     @action(methods=["PUT"], detail=False, name="change_password")
     def change_password(self, request, *args, **kwargs):
@@ -179,6 +156,32 @@ class UserView(viewsets.ModelViewSet):
         return Response(
             {"message": "File processed", "users": serializer.data}, status=201
         )
+
+
+def send_email(user, receiver):
+    try:
+        yag = yagmail.SMTP(
+            "evaluador.usfx@gmail.com", oauth2_file="./oauth2_creds.json"
+        )
+        token = RefreshToken.for_user(user).access_token
+
+        contents = render_to_string(
+            "password_recovery.html",
+            context={
+                "name": user.first_name or user.last_name or user.username,
+                "token": str(token),
+            },
+        ).replace("\n", "")
+
+        yag.send(
+            to=receiver,
+            subject="Restablecer contraseña",
+            contents=contents,
+            prettify_html=False,
+        )
+
+    except Exception as e:
+        print(e)
 
 
 def censor_email(email):
