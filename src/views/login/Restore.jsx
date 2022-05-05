@@ -51,17 +51,22 @@ export default function Restore() {
       const { status } = await authService.changePassword(values.password)
 
       if (status === 200) {
-        setAlertSeverity("success")
-        setAlertMsg("Contraseña cambiada")
         setOpen(true)
+        setAlertSeverity("success")
+        setAlertMsg(
+          <>
+            Contraseña cambiada, redirigiendo al &nbsp;
+            <Link component={RouterLink} to="/login" color="inherit">
+              inicio de sesión
+            </Link>
+            ...
+          </>
+        )
 
         setTimeout(() => navigate("/login"), 5000)
-      } else {
-        setAlertSeverity("error")
-        setAlertMsg("El token no es válido o ha expirado")
-        setOpen(true)
       }
     } catch (err) {
+      setOpen(true)
       setAlertSeverity("error")
       setAlertMsg("El token no es válido o ha expirado")
       setOpen(true)
