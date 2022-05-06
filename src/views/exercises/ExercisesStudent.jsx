@@ -21,14 +21,6 @@ function topicsCell(params) {
   return <TopicChips topics={params.row.topics} />
 }
 
-function nameCell(params) {
-  return (
-    <Link component={RouterLink} to={`/ejercicios/${params.row.id}/subir`} color="inherit">
-      {params.row.name}
-    </Link>
-  )
-}
-
 function StatusCell({ row }) {
   return row.status ? <CheckCircle color="success" /> : <Close color="error" />
 }
@@ -51,7 +43,7 @@ export default function ExercisesStudent(props) {
       field: "name",
       headerName: "Nombre",
       flex: 0.3,
-      renderCell: nameCell,
+      renderCell: NameCell,
     },
     {
       field: "topics",
@@ -89,6 +81,14 @@ export default function ExercisesStudent(props) {
   useEffect(() => {
     getAllPractices()
   }, [taskId, page, pageSize, query])
+
+  function NameCell(params) {
+    return (
+      <Link component={RouterLink} to={`/enviar/${taskId}/${params.row.id}/`} color="inherit">
+        {params.row.name}
+      </Link>
+    )
+  }
 
   return (
     <Container>

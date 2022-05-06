@@ -10,7 +10,7 @@ import CodeEditor from "../../components/CodeEditor"
 export default function SubmitExercise(props) {
   const { showNotification } = props
 
-  const { exerciseId } = useParams()
+  const { taskId, exerciseId } = useParams()
   const navigate = useNavigate()
 
   const [code, setCode] = useState("")
@@ -35,7 +35,11 @@ export default function SubmitExercise(props) {
     }
 
     try {
-      const { status } = await exerciseService.submit({ id: exerciseId, code: code })
+      const { status } = await exerciseService.submit({
+        id: exerciseId,
+        task_id: taskId,
+        code: code,
+      })
 
       if (status === 200) {
         showNotification("success", "Ejercicio enviado")

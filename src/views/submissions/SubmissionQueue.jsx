@@ -16,31 +16,7 @@ export default function SubmissionQueue(props) {
     let timeout = 250
     let connectInterval
 
-    ws.onmessage = event => {
-      const messageReceived = JSON.parse(event.data)
-
-      setMessages(messages => {
-        const messageOld = messages.find(
-          msg => msg.exercise == messageReceived.exercise && msg.user == messageReceived.user
-        )
-
-        if (messageOld) {
-          return messages.map(msg => {
-            if (msg === messageOld) {
-              return {
-                ...msg,
-                status_name: messageReceived.status_name,
-                date: messageReceived.date,
-                time: messageReceived.time,
-              }
-            }
-            return msg
-          })
-        }
-
-        return [messageReceived, ...messages]
-      })
-    }
+    ws.onmessage = handleOnMessage
 
     ws.onopen = () => {
       console.info("websocket connected")
@@ -65,6 +41,34 @@ export default function SubmissionQueue(props) {
     }
 
     return ws
+  }
+
+  function handleOnMessage(event) {
+    const messageReceived = JSON.parse(event.data)
+
+    setMessages(messages => {
+      const messageOld = messages.find(
+        msg =>
+          msg.exercise == messageReceived.exercise &&
+          msg.task == messageReceived.task &&
+          msg.user == messageReceived.user
+      )
+
+      if (messageOld) {
+        return messages.map(msg => {
+          if (msg === messageOld) {
+            return {
+              ...msg,
+              status_name: messageReceived.status_name,
+              datetime: messageReceived.datetime,
+            }
+          }
+          return msg
+        })
+      }
+
+      return [messageReceived, ...messages]
+    })
   }
 
   async function getSubmissions() {
@@ -95,8 +99,7 @@ export default function SubmissionQueue(props) {
               <ListItem key={i}>
                 <SubmissionCard
                   name={msg.exercise_name}
-                  date={msg.date}
-                  time={msg.time}
+                  datetime={msg.datetime}
                   status={msg.status_name}
                 />
               </ListItem>
@@ -116,8 +119,7 @@ export default function SubmissionQueue(props) {
           <ListItem key={sub.id}>
             <SubmissionCard
               name={sub.exercise_name}
-              date={sub.date}
-              time={sub.time}
+              datetime={sub.datetime}
               status={sub.status_name}
             />
           </ListItem>

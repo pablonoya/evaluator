@@ -35,14 +35,11 @@ export default function RoutesList(props) {
         <Route path="crear" element={<TaskForm showNotification={showNotification} />} />
       </Route>
 
-      <Route path="ejercicios">
-        <Route index element={<Exercises showNotification={showNotification} />} />
-        <Route
-          path=":exerciseId/subir"
-          element={<SubmitExercise showNotification={showNotification} />}
-        />
-      </Route>
-
+      <Route path="ejercicios" element={<Exercises showNotification={showNotification} />} />
+      <Route
+        path="enviar/:taskId/:exerciseId"
+        element={<SubmitExercise showNotification={showNotification} />}
+      />
       <Route path="mis-envios" element={<SubmissionQueue showNotification={showNotification} />} />
       <Route path="estudiantes" element={<Students showNotification={showNotification} />} />
       <Route path="envios" element={<Submissions showNotification={showNotification} />} />
