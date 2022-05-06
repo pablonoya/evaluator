@@ -39,9 +39,8 @@ class SubmissionView(viewsets.ModelViewSet):
                     "exercise_name",
                     "student",
                     "status_name",
-                    "date",
-                    "time",
-                    "evaluated_at",
+                    "score",
+                    "datetime",
                 ),
             )
             return self.get_paginated_response(serializer.data)

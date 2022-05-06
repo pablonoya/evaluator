@@ -24,11 +24,12 @@ export default function Submissions(props) {
   const [details, setDetails] = useState([])
 
   const columns = [
-    { field: "exercise_name", headerName: "Ejercicio", flex: 0.3 },
-    { field: "student", headerName: "Estudiante", flex: 0.3 },
-    { field: "status_name", headerName: "Estado", flex: 0.2 },
-    { field: "date", headerName: "Evaluado", flex: 0.2 },
-    { field: "actions", headerName: "Acciones", flex: 0.2, renderCell: actionsCell },
+    { field: "exercise_name", headerName: "Ejercicio", flex: 0.2 },
+    { field: "student", headerName: "Estudiante", flex: 0.15 },
+    { field: "status_name", headerName: "Estado", flex: 0.15 },
+    { field: "score", headerName: "Calificación", flex: 0.1 },
+    { field: "datetime", headerName: "Evaluado", flex: 0.15 },
+    { field: "actions", headerName: "Acciones", flex: 0.15, renderCell: actionsCell },
   ]
 
   function handlePageChange(page) {
