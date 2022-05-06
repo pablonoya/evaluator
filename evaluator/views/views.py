@@ -1,3 +1,4 @@
+from django.db.models import Exists, OuterRef
 from django.contrib.auth.models import Group, User
 
 from rest_framework import viewsets, filters
@@ -5,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from evaluator.models import Exercise, Practice, Submission, Task
-from evaluator.serializers import ExerciseSerializer, SubmissionSerializer
+from evaluator.serializers import PracticeSerializer, SubmissionSerializer
 
 # Create your views here.
 class SubmissionView(viewsets.ModelViewSet):
@@ -55,7 +56,7 @@ class SubmissionView(viewsets.ModelViewSet):
 
 
 class PracticeView(viewsets.ModelViewSet):
-    serializer_class = ExerciseSerializer
+    serializer_class = PracticeSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["exercise__name"]
@@ -81,5 +82,10 @@ class PracticeView(viewsets.ModelViewSet):
 
                 practice.exercises.add(*exercises)
 
-        queryset = practice.exercises.all()
+        queryset = practice.exercises.annotate(
+            submitted=Exists(
+                Submission.objects.filter(exercise=OuterRef("id"), user=user, task=task)
+            )
+        )
+
         return queryset

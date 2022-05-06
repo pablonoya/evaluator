@@ -154,7 +154,6 @@ class ExerciseSerializer(DynamicFieldsModelSerializer):
             "output_examples",
             "input_examples_min",
             "output_examples_min",
-            "task",
             "topics",
         )
 
@@ -179,3 +178,22 @@ class ExerciseSerializer(DynamicFieldsModelSerializer):
         instance.save()
 
         return instance
+
+
+class PracticeSerializer(serializers.ModelSerializer):
+    topics = TopicSerializer(many=True, read_only=False)
+    status = serializers.SerializerMethodField()
+
+    def get_status(self, obj):
+        return obj.submitted
+
+    class Meta:
+        model = Exercise
+        fields = (
+            "id",
+            "name",
+            "input_examples_min",
+            "output_examples_min",
+            "topics",
+            "status",
+        )

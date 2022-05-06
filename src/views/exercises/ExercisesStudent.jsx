@@ -2,8 +2,8 @@ import { useState, useEffect } from "react"
 import { Link as RouterLink } from "react-router-dom"
 
 import { Container, Grid, Typography } from "@material-ui/core"
-import { Create, Delete, Refresh } from "@mui/icons-material"
-import { Button, IconButton, Link } from "@mui/material"
+import { CheckCircle, Close, Refresh } from "@mui/icons-material"
+import { Link } from "@mui/material"
 import LoadingButton from "@mui/lab/LoadingButton"
 import { Box } from "@mui/system"
 
@@ -29,6 +29,10 @@ function nameCell(params) {
   )
 }
 
+function StatusCell({ row }) {
+  return row.status ? <CheckCircle color="success" /> : <Close color="error" />
+}
+
 export default function ExercisesStudent(props) {
   const { showNotification } = props
 
@@ -36,7 +40,6 @@ export default function ExercisesStudent(props) {
   const { taskId } = useParams()
 
   const [data, setData] = useState({ results: [], count: 0 })
-  const [task, setTask] = useState(taskId)
 
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
@@ -58,9 +61,10 @@ export default function ExercisesStudent(props) {
       renderCell: topicsCell,
     },
     {
-      field: "status",
-      headerName: "Estado",
-      flex: 0.2,
+      field: "submitted",
+      headerName: "Enviado",
+      flex: 0.15,
+      renderCell: StatusCell,
     },
   ]
 
@@ -70,7 +74,7 @@ export default function ExercisesStudent(props) {
       const res = await practiceService.getAll({
         page: page,
         page_size: pageSize,
-        taskId: task,
+        taskId: taskId,
         userId: auth.id,
         ...(query && { search: query }),
       })
