@@ -21,7 +21,7 @@ function topicsCell(params) {
 
 function nameCell(params) {
   return (
-    <Link component={RouterLink} to={`tareas/${params.row.id}/`} color="inherit">
+    <Link component={RouterLink} to={`${params.row.id}`} color="inherit">
       {params.row.name}
     </Link>
   )

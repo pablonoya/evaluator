@@ -23,15 +23,20 @@ export default function RoutesList(props) {
   return (
     <Routes>
       <Route index element={<Home />} />
-      <Route path="tareas" element={<Tasks showNotification={showNotification} />}>
+
+      <Route path="tareas">
+        <Route index element={<Tasks showNotification={showNotification} />} />
         <Route path=":taskId/" element={<ExercisesStudent showNotification={showNotification} />} />
         <Route path=":taskId/editar" element={<TaskForm showNotification={showNotification} />} />
       </Route>
-      <Route path="temas" element={<Topics showNotification={showNotification} />}>
+
+      <Route path="temas">
+        <Route element={<Topics showNotification={showNotification} />} />
         <Route path="crear" element={<TaskForm showNotification={showNotification} />} />
       </Route>
 
-      <Route path="ejercicios" element={<Exercises showNotification={showNotification} />}>
+      <Route path="ejercicios">
+        <Route index element={<Exercises showNotification={showNotification} />} />
         <Route
           path=":exerciseId/subir"
           element={<SubmitExercise showNotification={showNotification} />}
