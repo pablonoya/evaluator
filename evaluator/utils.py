@@ -18,29 +18,34 @@ ACCEPTED = 4
 WRONG_ANSWER = 5
 
 
-def code_runner(source_code, exercise_id, user_id, timelimit="1s"):
+def code_runner(source_code, exercise_id, task_id, user_id, timelimit="1s"):
     # Create a container and compile the code
     container = prepare_container(source_code)
     res = container.exec_run("g++ code.cpp -o executable")
 
-    # Get excercise
+    # Get excercise name
     exercise = Exercise.objects.get(id=exercise_id)
 
     # Compilation fails
     if res.exit_code == 1:
         asyncio.run(
-            send_websocket_message("Fallido", exercise.id, user_id, exercise.name)
+            send_websocket_message(
+                "Error de compilación", exercise_id, task_id, user_id, exercise.name
+            )
         )
         return COMPILATION_ERROR
 
     # Review exercise
-    Submission.objects.update_or_create(
+    submission, _ = Submission.objects.update_or_create(
         exercise=exercise_id,
+        task=task_id,
         user=user_id,
-        defaults={"score": 0, "status": 1},
+        defaults={"score": 0, "status": REVIEW},
     )
     asyncio.run(
-        send_websocket_message("En Revisión", exercise.id, user_id, exercise.name)
+        send_websocket_message(
+            "En Revisión", exercise_id, task_id, user_id, exercise.name
+        )
     )
 
     output = []
@@ -58,14 +63,12 @@ def code_runner(source_code, exercise_id, user_id, timelimit="1s"):
 
     container.remove(force=True)
 
-    score = get_score(output, exercise.output_examples)
+    score = calculate_score(output, exercise.output_examples)
 
     # update submission
-    Submission.objects.update_or_create(
-        exercise=exercise_id,
-        user=user_id,
-        defaults={"score": score, "output": "\n".join(output)},
-    )
+    submission.score = score
+    submission.output = "\n".join(output)
+    submission.save()
 
     veredict = ACCEPTED if score > 0.5 else WRONG_ANSWER
     return veredict
@@ -88,7 +91,7 @@ def prepare_container(source_code):
     return container
 
 
-def get_score(output, output_examples):
+def calculate_score(output, output_examples):
     score = 0
     output_examples_list = output_examples.splitlines()
 
@@ -101,7 +104,7 @@ def get_score(output, output_examples):
 
 
 async def send_websocket_message(
-    status, exercise_id, user_id, exercise_name="", datetime=datetime.now()
+    status, exercise_id, task_id, user_id, exercise_name="", datetime=datetime.now()
 ):
     channel_layer = get_channel_layer()
 
@@ -113,10 +116,10 @@ async def send_websocket_message(
                 {
                     "status_name": status,
                     "exercise": exercise_id,
+                    "task": task_id,
                     "user": user_id,
                     "exercise_name": exercise_name,
-                    "date": datetime.strftime("%d-%m-%Y"),
-                    "time": datetime.strftime("%H:%M:%S"),
+                    "datetime": datetime.strftime("%d-%m-%Y %H:%M"),
                 },
                 ensure_ascii=False,
             ),

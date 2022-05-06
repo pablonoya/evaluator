@@ -31,7 +31,6 @@ class Exercise(models.Model):
     description = models.TextField()
     input_examples = models.TextField()
     output_examples = models.TextField()
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True)
     topics = models.ManyToManyField(Topic)
 
     def input_examples_min(self):
@@ -53,6 +52,7 @@ class Submission(models.Model):
         ACCEPTED = 4
         WRONG_ANSWER = 5
 
+    task = models.ForeignKey(Task, null=True, on_delete=models.CASCADE)
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     score = models.DecimalField(max_digits=3, decimal_places=1, default=0)

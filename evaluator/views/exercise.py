@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import filters
 
-from evaluator.models import Exercise, Practice, Submission
+from evaluator.models import Exercise, Practice, Submission, Task
 from evaluator.serializers import ExerciseSerializer
 
 from evaluator.utils import (
@@ -24,6 +24,7 @@ from evaluator.utils import (
 def report_success(job, connection, result, *args, **kwargs):
     submission = Submission.objects.filter(
         exercise=job.meta["exercise_id"],
+        task=job.meta["task_id"],
         user=job.meta["user_id"],
     )
     submission.update(
@@ -35,6 +36,7 @@ def report_success(job, connection, result, *args, **kwargs):
         send_websocket_message(
             submission.get().status_name(),
             job.meta["exercise_id"],
+            job.meta["task_id"],
             job.meta["user_id"],
             job.meta["exercise_name"],
             utc_to_local(job.ended_at),
@@ -132,38 +134,45 @@ class ExerciseView(viewsets.ModelViewSet):
     @action(detail=False, methods=["POST"], name="submit")
     def submit(self, request, *args, **kwargs):
         exercise_id = request.data["id"]
+        task_id = request.data["task_id"]
         source_code = request.data["code"]
+
         user_id = request.user.id
 
         exercise = Exercise.objects.get(id=exercise_id)
+        task = Task.objects.get(id=task_id)
         user = User.objects.get(id=user_id)
 
         # enqueue the submission
-        default_queue = get_queue("default")
-        job = default_queue.enqueue(
-            code_runner,
-            source_code,
-            exercise_id,
-            user_id,
-            description=f"Submit {exercise.name} by {user.username}",
-            retry=Retry(max=3, interval=60),
-            on_success=report_success,
-            meta={
-                "exercise_id": exercise.id,
+        queue_params = {
+            "description": f"Submit {exercise.name} by {user.username} for {task.name}",
+            "retry": Retry(max=3, interval=60),
+            "on_success": report_success,
+            "meta": {
+                "exercise_id": exercise_id,
+                "task_id": task_id,
                 "user_id": user_id,
                 "exercise_name": exercise.name,
             },
+        }
+
+        default_queue = get_queue("default")
+        job = default_queue.enqueue(
+            code_runner, source_code, exercise_id, task_id, user_id, **queue_params
         )
 
         if job.is_queued:
             Submission.objects.update_or_create(
                 exercise=exercise,
+                task_id=task_id,
                 user=user,
                 defaults={"score": 0, "source_code": source_code, "status": 1},
             )
 
             asyncio.run(
-                send_websocket_message("En cola", exercise.id, user_id, exercise.name)
+                send_websocket_message(
+                    "En cola", exercise_id, task_id, user_id, exercise.name
+                )
             )
 
             return Response(data={"message": "queued", "status": 200})
