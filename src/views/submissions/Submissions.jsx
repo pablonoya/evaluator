@@ -23,6 +23,7 @@ export default function Submissions(props) {
   const [details, setDetails] = useState([])
 
   const columns = [
+    { field: "task_name", headerName: "Tarea", flex: 0.2 },
     { field: "exercise_name", headerName: "Ejercicio", flex: 0.2 },
     { field: "student", headerName: "Estudiante", flex: 0.15 },
     { field: "status_name", headerName: "Estado", flex: 0.15 },

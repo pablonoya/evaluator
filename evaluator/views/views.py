@@ -37,6 +37,7 @@ class SubmissionView(viewsets.ModelViewSet):
                 many=True,
                 fields=(
                     "id",
+                    "task_name",
                     "exercise_name",
                     "student",
                     "status_name",

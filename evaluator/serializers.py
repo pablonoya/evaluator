@@ -112,6 +112,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SubmissionSerializer(DynamicFieldsModelSerializer):
+    task_name = serializers.CharField(source="task.name")
     exercise_name = serializers.CharField(source="exercise.name")
     student = serializers.SerializerMethodField()
     date = serializers.DateTimeField(format="%d/%m/%Y", source="evaluated_at")
@@ -125,6 +126,7 @@ class SubmissionSerializer(DynamicFieldsModelSerializer):
         model = Submission
         fields = (
             "id",
+            "task_name",
             "exercise",
             "exercise_name",
             "user",
