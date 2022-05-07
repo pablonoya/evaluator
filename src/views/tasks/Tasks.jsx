@@ -33,7 +33,7 @@ export default function Tasks(props) {
   const [data, setData] = useState({ results: [], count: 0 })
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
-  const [query, setQuery] = useState()
+  const [pageSize, setPageSize] = useState(10)
 
   const [auth] = useAuth()
 
@@ -56,12 +56,13 @@ export default function Tasks(props) {
     },
   ]
 
-  async function getAll() {
+  async function getAll(query) {
     try {
       setLoading(true)
 
       const res = await taskService.getAll({
         page: page,
+        page_size: pageSize,
         ...(query && { search: query }),
       })
       if (res.status === 200) {
@@ -108,7 +109,7 @@ export default function Tasks(props) {
 
   useEffect(() => {
     getAll()
-  }, [page, query])
+  }, [page, pageSize])
 
   return (
     <Container>
@@ -118,7 +119,7 @@ export default function Tasks(props) {
         </Grid>
         <Grid item xs={7}>
           <Grid container justifyContent="flex-end">
-            <SearchInput query={query} setQuery={setQuery} placeholder="Buscar por nombre..." />
+            <SearchInput callback={getAll} placeholder="Buscar por nombre..." />
             <Box sx={{ "& > button, a": { ml: 1, mb: 1 } }}>
               <LoadingButton
                 variant="outlined"
@@ -147,7 +148,10 @@ export default function Tasks(props) {
         columns={filterItemsByGroups(columns, auth.groups)}
         rows={data.results}
         rowCount={data.count}
+        page={page}
         onPageChange={page => setPage(page + 1)}
+        pageSize={pageSize}
+        onPageSizeChange={size => setPageSize(size)}
         loading={loading}
       />
     </Container>

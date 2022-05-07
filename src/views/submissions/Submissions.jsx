@@ -17,7 +17,6 @@ export default function Submissions(props) {
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [query, setQuery] = useState()
 
   const [data, setData] = useState({ results: [], count: 0 })
   const [open, setOpen] = useState(false)
@@ -36,7 +35,7 @@ export default function Submissions(props) {
     setPage(page + 1)
   }
 
-  async function getSubmissions(page) {
+  async function getSubmissions(query) {
     try {
       setLoading(true)
 
@@ -79,8 +78,8 @@ export default function Submissions(props) {
   }
 
   useEffect(() => {
-    getSubmissions(page)
-  }, [page, query])
+    getSubmissions()
+  }, [page, pageSize])
 
   return (
     <Container>
@@ -91,11 +90,7 @@ export default function Submissions(props) {
         <Grid item xs={11}>
           <Grid container justifyContent="flex-end">
             <Box sx={{ "& > button": { ml: 1, mb: 1 } }}>
-              <SearchInput
-                query={query}
-                setQuery={setQuery}
-                placeholder="Ejercicio o estudiante..."
-              />
+              <SearchInput callback={getSubmissions} placeholder="Ejercicio o estudiante..." />
               <LoadingButton
                 sx={{ mb: 1 }}
                 variant="outlined"

@@ -36,7 +36,6 @@ export default function ExercisesStudent(props) {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [query, setQuery] = useState()
 
   const columns = [
     {
@@ -60,7 +59,7 @@ export default function ExercisesStudent(props) {
     },
   ]
 
-  async function getAllPractices() {
+  async function getAllPractices(query) {
     setLoading(true)
     try {
       const res = await practiceService.getAll({
@@ -80,7 +79,7 @@ export default function ExercisesStudent(props) {
 
   useEffect(() => {
     getAllPractices()
-  }, [taskId, page, pageSize, query])
+  }, [taskId, page, pageSize])
 
   function NameCell(params) {
     return (
@@ -99,7 +98,7 @@ export default function ExercisesStudent(props) {
         <Grid item xs={7}>
           <Grid container justifyContent="flex-end">
             <Box sx={{ "& > button": { ml: 1, mb: 1 } }}>
-              <SearchInput query={query} setQuery={setQuery} placeholder="Buscar por nombre..." />
+              <SearchInput callback={getAllPractices} placeholder="Buscar por nombre..." />
               <LoadingButton
                 variant="outlined"
                 startIcon={<Refresh />}

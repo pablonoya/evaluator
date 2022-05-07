@@ -31,7 +31,6 @@ export default function Students(props) {
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false)
   const [restoredPassword, setRestoredPassword] = useState(false)
   const [userId, setUserId] = useState(0)
-  const [query, setQuery] = useState()
 
   const columns = [
     { field: "cu", headerName: "CU", flex: 0.1 },
@@ -49,7 +48,7 @@ export default function Students(props) {
     },
   ]
 
-  async function getStudents() {
+  async function getStudents(query) {
     setLoading(true)
     try {
       const res = await studentService.getAll({
@@ -131,7 +130,7 @@ export default function Students(props) {
 
   useEffect(() => {
     getStudents()
-  }, [page, pageSize, query])
+  }, [page, pageSize])
 
   return (
     <Container>
@@ -142,11 +141,7 @@ export default function Students(props) {
         <Grid item xs={8}>
           <Grid container justifyContent="flex-end">
             <Box sx={{ "& > button, a": { ml: 1, mb: 1 } }}>
-              <SearchInput
-                query={query}
-                setQuery={setQuery}
-                placeholder="CU, nombre o apellido..."
-              />
+              <SearchInput callback={getStudents} placeholder="CU, nombre o apellido..." />
 
               <LoadingButton
                 variant="outlined"

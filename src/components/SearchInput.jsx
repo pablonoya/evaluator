@@ -1,13 +1,22 @@
+import { useState, useEffect } from "react"
+
 import { IconButton, TextField } from "@mui/material"
 import { Clear, Search } from "@mui/icons-material"
 
+let timer
+
 export default function SearchInput(props) {
-  const { query, setQuery, ...rest } = props
+  const { callback, ...rest } = props
+  const [query, setQuery] = useState()
+
+  useEffect(() => {
+    clearTimeout(timer)
+    timer = setTimeout(() => callback(query), 250)
+  }, [query])
 
   return (
     <TextField
       value={query}
-      variant="outlined"
       size="small"
       onChange={e => setQuery(e.target.value)}
       InputProps={{

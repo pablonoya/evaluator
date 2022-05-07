@@ -19,8 +19,6 @@ export default function Topics(props) {
   const [editing, setEditing] = useState(false)
   const [formValues, setFormValues] = useState({ name: "" })
 
-  const [query, setQuery] = useState("")
-
   const [data, setData] = useState({ results: [], count: 0 })
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
@@ -37,7 +35,7 @@ export default function Topics(props) {
     },
   ]
 
-  async function getTopics() {
+  async function getTopics(query) {
     try {
       setLoading(true)
 
@@ -93,7 +91,7 @@ export default function Topics(props) {
 
   useEffect(() => {
     getTopics()
-  }, [query, page, pageSize])
+  }, [page, pageSize])
 
   return (
     <div>
@@ -104,7 +102,7 @@ export default function Topics(props) {
         <Grid item xs={7}>
           <Grid container justifyContent="flex-end">
             <Box sx={{ "& > button, a": { ml: 1, mb: 1 } }}>
-              <SearchInput query={query} setQuery={setQuery} placeholder="Buscar por nombre..." />
+              <SearchInput callback={getTopics} placeholder="Buscar por nombre..." />
               <LoadingButton
                 variant="outlined"
                 startIcon={<Refresh />}
