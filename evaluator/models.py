@@ -55,7 +55,7 @@ class Submission(models.Model):
     task = models.ForeignKey(Task, null=True, on_delete=models.CASCADE)
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    score = models.DecimalField(max_digits=3, decimal_places=1, default=0)
+    score = models.DecimalField(max_digits=4, decimal_places=1, default=0)
     source_code = models.TextField()
     output = models.TextField()
     status = models.IntegerField(choices=Status.choices)
