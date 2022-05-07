@@ -18,10 +18,14 @@ class TopicView(viewsets.ModelViewSet):
 
 class TaskView(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
-    queryset = Task.objects.all()
     permission_classes = (IsAuthenticated,)
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["name"]
+
+    def get_queryset(self):
+        if self.request.user.groups.filter(name="Alumnos"):
+            return Task.objects.filter(assignment__exercises_number__gt=0).distinct()
+        return Task.objects.all()
 
     @action(detail=True, methods=["PUT"], name="release")
     def release(self, request, pk, *args, **kwargs):
