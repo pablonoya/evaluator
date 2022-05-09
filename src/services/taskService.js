@@ -28,6 +28,10 @@ class TaskService {
   release(id, data) {
     return http.put(`${this.url + id}/release/`, data)
   }
+
+  getAllWithExercises() {
+    return http.get(`${this.url}get_all_with_exercises/`)
+  }
 }
 
 export default new TaskService()

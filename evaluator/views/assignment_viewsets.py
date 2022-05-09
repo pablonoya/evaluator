@@ -36,6 +36,17 @@ class TaskView(viewsets.ModelViewSet):
 
         return Response(data={"message": "Assignment released"}, status=200)
 
+    @action(detail=False, methods=["GET"])
+    def get_all_with_exercises(self, request):
+        queryset = (
+            Assignment.objects.filter(exercises_number__gt=0)
+            .select_related("task")
+            .distinct()
+            .values_list("task__name", flat=True)
+        )
+
+        return Response(queryset)
+
 
 class AssignmentView(viewsets.ModelViewSet):
     serializer_class = AssignmentSerializer
