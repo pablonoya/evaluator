@@ -1,11 +1,20 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Autocomplete, Container, Grid, TextField, Typography } from "@mui/material"
-import { useEffect } from "react"
 
 import reportsService from "../../services/reportsService"
+import taskService from "../../services/taskService"
+
 import DataTable from "../../components/DataTable"
 
-const reportsList = [
+const reportList = [
+  {
+    title: "Calificaciones por tarea",
+    url: "/score_per_task",
+    columns: [
+      { field: "first_name", headerName: "Nombres" },
+      { field: "last_name", headerName: "Apellidos" },
+    ],
+  },
   {
     title: "Calificaciones por estudiante",
     url: "/score_per_student",
@@ -22,7 +31,7 @@ const reportsList = [
     ],
   },
   {
-    title: "Envíos por ejercicios",
+    title: "Envíos por ejercicio",
     url: "/submissions_per_exercise",
     columns: [
       { field: "exercise__name", headerName: "Nombre", flex: 0.4 },
@@ -44,12 +53,22 @@ export default function Reports(props) {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
 
+  async function prepareDynamicColumns() {
+    const { data } = await taskService.getAllWithExercises()
+
+    reportList[0].columns = [
+      { field: "last_name", headerName: "Apellidos", flex: 0.1 },
+      { field: "first_name", headerName: "Nombres", flex: 0.1 },
+      ...data.map(name => ({ field: name, flex: 0.1 })),
+    ]
+  }
+
   async function getReport() {
     setLoading(true)
 
     try {
       const { data } = await reportsService.get(stat.url, {
-        page: page,
+        page: page + 1,
         page_size: pageSize,
       })
       setData(data)
@@ -61,13 +80,17 @@ export default function Reports(props) {
   }
 
   useEffect(() => {
+    prepareDynamicColumns()
+  }, [])
+
+  useEffect(() => {
     if (stat) {
       getReport()
     }
-  }, [stat, page, page, pageSize])
+  }, [stat, page, pageSize])
 
   return (
-    <Container>
+    <Container component="main">
       <Grid container>
         <Grid item xs={8}>
           <Typography variant="h5">Reportes</Typography>
@@ -77,7 +100,7 @@ export default function Reports(props) {
           <Autocomplete
             size="small"
             noOptionsText="No encontrado"
-            options={reportsList}
+            options={reportList}
             value={stat}
             getOptionLabel={val => val.title}
             onChange={(_e, newValue) => setStat(newValue)}
@@ -96,8 +119,9 @@ export default function Reports(props) {
           columns={stat.columns}
           rows={data.results}
           rowCount={data.count}
+          page={page}
           pageSize={pageSize}
-          onPageChange={page => setPage(page + 1)}
+          onPageChange={page => setPage(page)}
           onPageSizeChange={size => setPageSize(size)}
         />
       )}
