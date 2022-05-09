@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+from decimal import Decimal
 import json
 import docker
 import tarfile
@@ -28,6 +29,7 @@ def code_runner(source_code, exercise_id, task_id, user_id, timelimit="1s"):
 
     # Compilation fails
     if res.exit_code == 1:
+        container.remove(force=True)
         asyncio.run(
             send_websocket_message(
                 "Error de compilación", exercise_id, task_id, user_id, exercise.name
@@ -36,42 +38,53 @@ def code_runner(source_code, exercise_id, task_id, user_id, timelimit="1s"):
         return COMPILATION_ERROR
 
     # Review exercise
-    submission, _ = Submission.objects.update_or_create(
-        exercise=exercise_id,
-        task=task_id,
-        user=user_id,
-        defaults={"score": 0, "status": REVIEW},
-    )
-    asyncio.run(
-        send_websocket_message(
-            "En Revisión", exercise_id, task_id, user_id, exercise.name
+    try:
+        submission, _ = Submission.objects.update_or_create(
+            exercise=exercise_id,
+            task=task_id,
+            user=user_id,
+            defaults={"score": 0, "status": REVIEW},
         )
-    )
-
-    output = []
-    for test_case in exercise.input_examples.splitlines():
-        # test every case within the time limit
-        res = container.exec_run(
-            f"timeout {timelimit} bash -c './executable <<< \"{test_case}\"'",
-            tty=True,
+        asyncio.run(
+            send_websocket_message(
+                "En Revisión", exercise_id, task_id, user_id, exercise.name
+            )
         )
 
-        if res.exit_code == 124:
-            return TLE
+        output = []
+        for test_case in exercise.input_examples.splitlines():
+            # test every case within the time limit
+            res = container.exec_run(
+                f"timeout {timelimit} bash -c './executable <<< \"{test_case}\"'",
+                tty=True,
+            )
 
-        output.append(res.output.decode("utf-8"))
+            if res.exit_code == 124:
+                return TLE
 
-    container.remove(force=True)
+            output.append(res.output.decode("utf-8"))
 
-    score = calculate_score(output, exercise.output_examples)
+        score = calculate_score(output, exercise.output_examples)
 
-    # update submission
-    submission.score = score
-    submission.output = "\n".join(output)
-    submission.save()
+        # update submission
+        submission.score = score
+        submission.output = "\n".join(output)
+        submission.save()
 
-    veredict = ACCEPTED if score > 0.5 else WRONG_ANSWER
-    return veredict
+        veredict = ACCEPTED if score > 0.5 else WRONG_ANSWER
+        return veredict
+
+    except Exception as e:
+        print(e)
+        asyncio.run(
+            send_websocket_message(
+                "Error de compilación", exercise_id, task_id, user_id, exercise.name
+            )
+        )
+        return COMPILATION_ERROR
+
+    finally:
+        container.remove(force=True)
 
 
 def prepare_container(source_code):
@@ -100,7 +113,7 @@ def calculate_score(output, output_examples):
             score += 1
 
     score /= len(output_examples_list)
-    return score
+    return Decimal(str(score)) * Decimal("100.0")
 
 
 async def send_websocket_message(
