@@ -22,7 +22,7 @@ class SubmissionView(viewsets.ModelViewSet):
 
         if student_group in user.groups.all():
             queryset = queryset.filter(user=self.request.user.id).order_by(
-                "-evaluated_at"
+                "task_id", "-evaluated_at"
             )
 
         return self.filter_queryset(queryset)
