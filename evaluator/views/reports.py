@@ -1,4 +1,8 @@
+from django.http import HttpResponse
+import pandas as pd
+
 from decimal import Decimal
+
 from django.contrib.auth import get_user_model
 from django.db.models import (
     Q,
@@ -21,6 +25,12 @@ from evaluator.models import Assignment, Practice, Submission
 
 
 class ReportView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    def paginated_response(self, queryset):
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            return self.get_paginated_response(page)
+        return Response(queryset)
+
     @action(detail=False, methods=["GET"])
     def submissions_per_exercise(self, request):
         queryset = (
@@ -36,12 +46,7 @@ class ReportView(mixins.ListModelMixin, viewsets.GenericViewSet):
             .values("id", "exercise__name", "failed", "accepted", "tle", "wrong")
         )
 
-        page = self.paginate_queryset(queryset)
-
-        if page is not None:
-            return self.get_paginated_response(page)
-
-        return Response(queryset)
+        return self.paginated_response(queryset)
 
     @action(detail=False, methods=["GET"])
     def score_per_student(self, request):
@@ -58,12 +63,7 @@ class ReportView(mixins.ListModelMixin, viewsets.GenericViewSet):
             .order_by("user__last_name")
         )
 
-        page = self.paginate_queryset(queryset)
-
-        if page is not None:
-            return self.get_paginated_response(page)
-
-        return Response(queryset)
+        return self.paginated_response(queryset)
 
     @action(detail=False, methods=["GET"])
     def score_per_task(self, request):
@@ -95,27 +95,45 @@ class ReportView(mixins.ListModelMixin, viewsets.GenericViewSet):
             output_field=DecimalField(),
         )
 
-        tasks_cols = {
-            a["task__name"]: average_score(a["task__id"]) for a in assignments
-        }
+        task_names = [a["task__name"] for a in assignments]
+        task_cols = {a["task__name"]: average_score(a["task__id"]) for a in assignments}
+
+        queryset_cols = [
+            "id",
+            "last_name",
+            "first_name",
+            *task_names,
+        ]
 
         queryset = (
             students.annotate(
-                **tasks_cols,
+                **task_cols,
             )
-            .values(
-                "id",
-                "username",
-                "first_name",
-                "last_name",
-                *[a["task__name"] for a in assignments],
-            )
+            .values(*queryset_cols)
             .order_by("last_name")
         )
 
-        page = self.paginate_queryset(queryset)
+        if request.query_params.get("excel"):
+            excel_cols = ["Apellidos", "Nombres", *task_names]
+            return excel_response(queryset, queryset_cols, excel_cols)
 
-        if page is not None:
-            return self.get_paginated_response(page)
+        return self.paginated_response(queryset)
 
-        return Response(queryset)
+
+def excel_response(queryset, queryset_cols, excel_cols):
+    df = pd.DataFrame(list(queryset), columns=queryset_cols)
+    df.columns = ["id", *excel_cols]
+
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    response["Content-Disposition"] = 'attachment; filename="filename.xlsx"'
+
+    df.to_excel(
+        response,
+        index=False,
+        columns=excel_cols,
+    )
+
+    return response

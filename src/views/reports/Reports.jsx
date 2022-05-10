@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react"
-import { Autocomplete, Container, Grid, TextField, Typography } from "@mui/material"
+import { Autocomplete, Button, Container, Grid, TextField, Typography } from "@mui/material"
 
 import reportsService from "../../services/reportsService"
 import taskService from "../../services/taskService"
+import http from "../../services/http-common"
 
 import DataTable from "../../components/DataTable"
+import { FileDownload } from "@mui/icons-material"
 
 const reportList = [
   {
@@ -47,7 +49,7 @@ export default function Reports(props) {
   const { showNotification } = props
 
   const [data, setData] = useState(null)
-  const [stat, setStat] = useState(null)
+  const [report, setReport] = useState(null)
 
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
@@ -67,7 +69,7 @@ export default function Reports(props) {
     setLoading(true)
 
     try {
-      const { data } = await reportsService.get(stat.url, {
+      const { data } = await reportsService.get(report.url, {
         page: page + 1,
         page_size: pageSize,
       })
@@ -79,20 +81,44 @@ export default function Reports(props) {
     }
   }
 
+  async function excelExport() {
+    try {
+      const res = await http.get(`/evaluator/api/reports${report.url}/`, {
+        params: { excel: true },
+        responseType: "arraybuffer",
+      })
+
+      if (res.headers["content-type"] == "application/json") {
+        return
+      }
+
+      const blob = new Blob([res.data], {
+        type: res.headers["content-type"],
+      })
+
+      const link = document.createElement("a")
+      link.href = window.URL.createObjectURL(blob)
+      link.download = `Reporte de ${report.title}.xlsx`
+      link.click()
+    } catch (err) {
+      showNotification("error", err.toString())
+    }
+  }
+
   useEffect(() => {
     prepareDynamicColumns()
   }, [])
 
   useEffect(() => {
-    if (stat) {
+    if (report) {
       getReport()
     }
-  }, [stat, page, pageSize])
+  }, [report, page, pageSize])
 
   return (
     <Container component="main">
-      <Grid container>
-        <Grid item xs={8}>
+      <Grid container justifyContent="space-between">
+        <Grid item xs={6}>
           <Typography variant="h5">Reportes</Typography>
         </Grid>
 
@@ -101,9 +127,12 @@ export default function Reports(props) {
             size="small"
             noOptionsText="No encontrado"
             options={reportList}
-            value={stat}
+            value={report}
             getOptionLabel={val => val.title}
-            onChange={(_e, newValue) => setStat(newValue)}
+            onChange={(_e, newValue) => {
+              setPage(0)
+              setReport(newValue)
+            }}
             isOptionEqualToValue={(option, value) => option.title === value.title}
             renderInput={params => <TextField margin="dense" placeholder="Seleccione" {...params} />}
             selectOnFocus
@@ -111,12 +140,25 @@ export default function Reports(props) {
             handleHomeEndKeys
           />
         </Grid>
+
+        {/* <Grid item xs={2}> */}
+        <Button
+          variant="contained"
+          color="success"
+          sx={{ my: 1 }}
+          disabled={!report}
+          startIcon={<FileDownload />}
+          onClick={excelExport}
+        >
+          Excel
+        </Button>
+        {/* </Grid> */}
       </Grid>
 
-      {stat && data && (
+      {report && data && (
         <DataTable
           loading={loading}
-          columns={stat.columns}
+          columns={report.columns}
           rows={data.results}
           rowCount={data.count}
           page={page}
