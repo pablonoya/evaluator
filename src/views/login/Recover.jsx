@@ -106,9 +106,14 @@ export default function Recover() {
         setAlertMsg("El usuario no tiene un email asociado")
 
         setShowEmailInput(true)
-      } else {
+      } else if (err.response.status === 404) {
         setAlertSeverity("warning")
         setAlertMsg("El usuario no existe")
+
+        setShowEmailInput(false)
+      } else {
+        setAlertSeverity("error")
+        setAlertMsg(err.response.data?.detail || err.toString())
 
         setShowEmailInput(false)
       }
