@@ -6,7 +6,7 @@ import taskService from "../../services/taskService"
 import http from "../../services/http-common"
 
 import DataTable from "../../components/DataTable"
-import { FileDownload } from "@mui/icons-material"
+import { FileDownload, Refresh } from "@mui/icons-material"
 
 const reportList = [
   {
@@ -22,8 +22,8 @@ const reportList = [
     url: "/score_per_student",
     columns: [
       { field: "cu", headerName: "Carnet universitario", flex: 0.15 },
-      { field: "first_name", headerName: "Nombres", flex: 0.3 },
       { field: "last_name", headerName: "Apellidos", flex: 0.3 },
+      { field: "first_name", headerName: "Nombres", flex: 0.3 },
       {
         field: "score",
         headerName: "Calificación promedio",
@@ -118,7 +118,7 @@ export default function Reports(props) {
   return (
     <Container component="main">
       <Grid container justifyContent="space-between">
-        <Grid item xs={6}>
+        <Grid item xs={5}>
           <Typography variant="h5">Reportes</Typography>
         </Grid>
 
@@ -141,7 +141,16 @@ export default function Reports(props) {
           />
         </Grid>
 
-        {/* <Grid item xs={2}> */}
+        <Button
+          variant="outlined"
+          sx={{ my: 1 }}
+          disabled={!report}
+          startIcon={<Refresh />}
+          onClick={getReport}
+        >
+          Actualizar
+        </Button>
+
         <Button
           variant="contained"
           color="success"
@@ -152,7 +161,6 @@ export default function Reports(props) {
         >
           Excel
         </Button>
-        {/* </Grid> */}
       </Grid>
 
       {report && data && (
