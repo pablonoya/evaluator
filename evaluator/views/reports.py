@@ -96,7 +96,7 @@ class ReportView(mixins.ListModelMixin, viewsets.GenericViewSet):
         )
 
         score_sum = lambda task_id: (
-            Submission.objects.filter(task=task_id)
+            Submission.objects.filter(user__id=OuterRef("id"), task=task_id)
             .annotate(score_sum=Func("score", function="sum"))
             .values("score_sum")
         )
