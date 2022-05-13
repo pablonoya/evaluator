@@ -1,47 +1,61 @@
 import { useEffect, useState } from "react"
 
-import { Button, Container, Grid, IconButton, Typography } from "@mui/material"
+import { Button, Container, Grid, Typography } from "@mui/material"
+import { Box } from "@mui/system"
 import { LoadingButton } from "@mui/lab"
 import { AssignmentTurnedIn, Refresh } from "@mui/icons-material"
 
-import DataTable from "../../components/DataTable"
-import SubmissionDetail from "./SubmissionDetail"
-
 import submissionService from "../../services/submissionService"
 import SearchInput from "../../components/SearchInput"
-import { Box } from "@mui/system"
+import DataTable from "../../components/DataTable"
+
+import SubmissionDetail from "./SubmissionDetail"
+import SubmissionQueue from "./SubmissionQueue"
+import { useAuth } from "../../contexts/authContext"
+import { filterItemsByGroups } from "../../utils"
 
 export default function Submissions(props) {
   const { showNotification } = props
 
   const [loading, setLoading] = useState(false)
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(10)
 
   const [data, setData] = useState({ results: [], count: 0 })
   const [open, setOpen] = useState(false)
   const [details, setDetails] = useState([])
+  const [auth] = useAuth()
 
-  const columns = [
-    { field: "task_name", headerName: "Tarea", flex: 0.2 },
-    { field: "exercise_name", headerName: "Ejercicio", flex: 0.2 },
-    { field: "student", headerName: "Estudiante", flex: 0.15 },
-    { field: "status_name", headerName: "Estado", flex: 0.15 },
-    { field: "score", headerName: "Calificación", flex: 0.1 },
-    { field: "datetime", headerName: "Evaluado", flex: 0.15 },
-    { field: "actions", headerName: "Acciones", flex: 0.15, renderCell: actionsCell },
-  ]
+  const columns = filterItemsByGroups(
+    [
+      { field: "task_name", headerName: "Tarea", flex: 0.15 },
+      { field: "exercise_name", headerName: "Ejercicio", flex: 0.2 },
+      {
+        field: "student",
+        headerName: "Estudiante",
+        flex: 0.15,
+        groups: ["Docente"],
+      },
+      { field: "status_name", headerName: "Estado", flex: 0.15 },
+      { field: "score", headerName: "Calificación", flex: 0.1 },
+      { field: "datetime", headerName: "Evaluado", flex: 0.15 },
+      {
+        field: "actions",
+        headerName: "Acciones",
+        flex: 0.15,
+        renderCell: actionsCell,
+        groups: ["Docente"],
+      },
+    ],
+    auth.groups
+  )
 
-  function handlePageChange(page) {
-    setPage(page + 1)
-  }
-
-  async function getSubmissions(query) {
+  async function getAllSubmissions(query) {
     try {
       setLoading(true)
 
       const res = await submissionService.getAll({
-        page: page,
+        page: page + 1,
         page_size: pageSize,
         ...(query && { search: query }),
       })
@@ -79,26 +93,29 @@ export default function Submissions(props) {
   }
 
   useEffect(() => {
-    getSubmissions()
+    getAllSubmissions()
   }, [page, pageSize])
 
   return (
-    <Container>
+    <Container component="main">
       <Grid container>
-        <Grid item xs={1}>
+        <Grid item xs={12}>
+          <SubmissionQueue showNotification={showNotification} />
+        </Grid>
+
+        <Grid item xs={4}>
           <Typography variant="h5">Envíos</Typography>
         </Grid>
-        <Grid item xs={11}>
+        <Grid item xs={8}>
           <Grid container justifyContent="flex-end">
             <Box sx={{ "& > button": { ml: 1, mb: 1 } }}>
-              <SearchInput callback={getSubmissions} placeholder="Ejercicio o estudiante..." />
+              <SearchInput callback={getAllSubmissions} placeholder="Tarea o ejercicio..." />
               <LoadingButton
-                sx={{ mb: 1 }}
                 variant="outlined"
                 startIcon={<Refresh />}
                 loading={loading}
                 loadingPosition="start"
-                onClick={() => getSubmissions()}
+                onClick={() => getAllSubmissions()}
               >
                 Actualizar
               </LoadingButton>
@@ -111,7 +128,8 @@ export default function Submissions(props) {
         columns={columns}
         rows={data.results}
         rowCount={data.count}
-        onPageChange={handlePageChange}
+        page={page}
+        onPageChange={setPage}
         loading={loading}
         pageSize={pageSize}
         onPageSizeChange={size => setPageSize(size)}

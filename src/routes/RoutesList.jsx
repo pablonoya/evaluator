@@ -40,7 +40,7 @@ export default function RoutesList(props) {
         path="enviar/:taskId/:exerciseId"
         element={<SubmitExercise showNotification={showNotification} />}
       />
-      <Route path="mis-envios" element={<SubmissionQueue showNotification={showNotification} />} />
+      <Route path="mis-envios" element={<Submissions showNotification={showNotification} />} />
       <Route path="estudiantes" element={<Students showNotification={showNotification} />} />
       <Route path="envios" element={<Submissions showNotification={showNotification} />} />
       <Route path="reportes" element={<Reports showNotification={showNotification} />} />
