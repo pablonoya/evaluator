@@ -31,7 +31,7 @@ export default function RoutesList(props) {
       </Route>
 
       <Route path="temas">
-        <Route element={<Topics showNotification={showNotification} />} />
+        <Route index element={<Topics showNotification={showNotification} />} />
         <Route path="crear" element={<TaskForm showNotification={showNotification} />} />
       </Route>
 
