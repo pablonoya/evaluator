@@ -3,6 +3,7 @@ import asyncio
 from rq.job import Retry
 from django_rq.queues import get_queue
 from django.contrib.auth.models import User
+from django.db.models import F
 
 
 from rest_framework import viewsets
@@ -51,17 +52,20 @@ class ExerciseView(viewsets.ModelViewSet):
     search_fields = ["name"]
 
     def get_queryset(self):
+        user = self.request.user
         queryset = Exercise.objects.all()
 
-        is_student = self.request.user.groups.filter(name="Alumnos").exists()
+        is_student = user.groups.filter(name="Alumnos").exists()
         if is_student:
-            ids = Practice.objects.filter(student_id=self.request.user.id).values_list(
-                "exercises", flat=True
+            queryset = (
+                queryset.filter(practice__student=user)
+                .annotate(
+                    task=F("practice__task__name"), task_id=F("practice__task__id")
+                )
+                .distinct()
             )
-            queryset = queryset.filter(id__in=ids).distinct()
 
         task = self.request.query_params.get("task")
-
         if task:
             queryset = queryset.filter(task_id=int(task))
 
@@ -86,14 +90,15 @@ class ExerciseView(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def list(self, request):
-        is_teacher = request.user.groups.filter(name="Docente").exists()
-
         queryset = self.get_queryset()
 
-        fields = ["id", "name", "description", "topics"]
+        fields = ["id", "name", "topics"]
+        is_teacher = request.user.groups.filter(name="Docente").exists()
 
         if is_teacher:
             fields += ["description", "input_examples", "output_examples"]
+        else:
+            fields += ["task", "task_id", "practice_id"]
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -106,22 +111,6 @@ class ExerciseView(viewsets.ModelViewSet):
     def get_outputs(self, request, pk=None):
         queryset = self.get_queryset().get(id=pk)
         return Response(queryset.output_examples)
-
-    @action(detail=False, methods=["GET"], name="get_all_without_task")
-    def get_all_without_task(self, request, *args, **kwargs):
-        queryset = self.get_queryset().filter(task_id__isnull=True)
-
-        topic_ids = self.request.query_params.get("topic_ids")
-
-        if topic_ids:
-            queryset = queryset.filter(topics__id__in=topic_ids.split(",")).distinct()
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(
-                page, many=True, fields=["id", "name", "topics", "task"]
-            )
-            return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=["PUT"], name="update-task")
     def update_task(self, request, *args, **kwargs):

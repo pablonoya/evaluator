@@ -1,5 +1,5 @@
 from .reports import *
-from .exercise import *
+from .exercise_viewset import *
 from .assignment_viewsets import *
 
 from .user_view import *

@@ -29,10 +29,18 @@ function topicsCell(params) {
   return <TopicChips topics={params.row.topics} />
 }
 
-function nameCell(params) {
+function NameCell({ row }) {
   return (
-    <Link component={RouterLink} to={`${params.row.id}/subir`} color="inherit">
-      {params.row.name}
+    <Link component={RouterLink} to={`/enviar/${row.task_id}/${row.id}`} color="inherit">
+      {row.name}
+    </Link>
+  )
+}
+
+function TaskCell({ row }) {
+  return (
+    <Link component={RouterLink} to={`/tareas/${row.task_id}`} color="inherit">
+      {row.task}
     </Link>
   )
 }
@@ -53,29 +61,39 @@ export default function Exercises(props) {
   const [formValues, setFormValues] = useState(initialFormValues)
   const [auth] = useAuth()
 
-  const columns = [
-    {
-      field: "name",
-      headerName: "Nombre",
-      flex: 0.2,
-      renderCell: nameCell,
-    },
-    {
-      field: "topics",
-      headerName: "Temas",
-      flex: 0.6,
-      sortable: true,
-      renderCell: topicsCell,
-    },
-    {
-      field: "action",
-      headerName: "Acciones",
-      flex: 0.1,
-      sortable: false,
-      renderCell: actionsCell,
-      groups: ["Docente"],
-    },
-  ]
+  const columns = filterItemsByGroups(
+    [
+      {
+        field: "task",
+        headerName: "Tarea",
+        flex: 0.2,
+        renderCell: TaskCell,
+        groups: ["Alumnos"],
+      },
+      {
+        field: "name",
+        headerName: "Nombre",
+        flex: 0.2,
+        renderCell: NameCell,
+      },
+      {
+        field: "topics",
+        headerName: "Temas",
+        flex: 0.5,
+        sortable: true,
+        renderCell: topicsCell,
+      },
+      {
+        field: "action",
+        headerName: "Acciones",
+        flex: 0.1,
+        sortable: false,
+        renderCell: actionsCell,
+        groups: ["Docente"],
+      },
+    ],
+    auth.groups
+  )
 
   async function getAllExercises(query) {
     setLoading(true)
@@ -153,7 +171,7 @@ export default function Exercises(props) {
                 startIcon={<Refresh />}
                 loading={loading}
                 loadingPosition="start"
-                onClick={getAllExercises}
+                onClick={() => getAllExercises()}
               >
                 Actualizar
               </LoadingButton>
@@ -170,6 +188,7 @@ export default function Exercises(props) {
         columns={filterItemsByGroups(columns, auth.groups)}
         rows={data.results}
         rowCount={data.count}
+        getRowId={row => row.id + `${row.task_id}`}
         onPageChange={page => setPage(page + 1)}
         pageSize={pageSize}
         onPageSizeChange={size => setPageSize(size)}

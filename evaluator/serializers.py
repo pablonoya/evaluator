@@ -1,5 +1,3 @@
-from asyncio import tasks
-from pydoc_data.topics import topics
 from rest_framework import serializers
 from .models import Assignment, Submission, Task, Exercise, Topic
 
@@ -145,12 +143,22 @@ class SubmissionSerializer(DynamicFieldsModelSerializer):
 
 class ExerciseSerializer(DynamicFieldsModelSerializer):
     topics = TopicSerializer(many=True, read_only=False)
+    task = serializers.SerializerMethodField()
+    task_id = serializers.SerializerMethodField()
+
+    def get_task(self, obj):
+        return obj.task
+
+    def get_task_id(self, obj):
+        return obj.task_id
 
     class Meta:
         model = Exercise
         fields = (
             "id",
             "name",
+            "task",
+            "task_id",
             "description",
             "input_examples",
             "output_examples",
@@ -191,11 +199,4 @@ class PracticeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Exercise
-        fields = (
-            "id",
-            "name",
-            "input_examples_min",
-            "output_examples_min",
-            "topics",
-            "status",
-        )
+        fields = ("id", "name", "topics", "status")
