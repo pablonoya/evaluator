@@ -63,10 +63,9 @@ export default function ExercisesStudent(props) {
     setLoading(true)
     try {
       const res = await practiceService.getAll({
+        taskId: taskId,
         page: page,
         page_size: pageSize,
-        taskId: taskId,
-        userId: auth.id,
         ...(query && { search: query }),
       })
       setData(res.data)
@@ -104,7 +103,7 @@ export default function ExercisesStudent(props) {
                 startIcon={<Refresh />}
                 loading={loading}
                 loadingPosition="start"
-                onClick={getAllPractices}
+                onClick={() => getAllPractices()}
               >
                 Actualizar
               </LoadingButton>

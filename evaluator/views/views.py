@@ -64,7 +64,7 @@ class PracticeView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         task = self.request.query_params.get("taskId")
-        user = self.request.query_params.get("userId")
+        user = self.request.user.id
 
         practice, created = Practice.objects.get_or_create(
             task_id=task, student_id=user
