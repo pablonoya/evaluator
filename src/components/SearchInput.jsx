@@ -11,7 +11,9 @@ export default function SearchInput(props) {
 
   useEffect(() => {
     clearTimeout(timer)
-    timer = setTimeout(() => callback(query), 250)
+    if (query) {
+      timer = setTimeout(() => callback(query), 250)
+    }
   }, [query])
 
   return (
