@@ -5,6 +5,7 @@ import { useAuth } from "./contexts/authContext"
 
 import Loading from "./components/Loading"
 const Navigation = lazy(() => import("./components/Navigation.jsx"))
+// import Navigation from "./components/Navigation"
 
 import Login from "./views/login/Login"
 import Restore from "./views/login/Restore"
@@ -31,11 +32,11 @@ function App() {
 }
 
 function RequireAuth({ children }) {
-  const [auth, _] = useAuth(useAuth)
+  const [auth] = useAuth()
   const location = useLocation()
 
   if (!auth) {
-    return <Navigate to="/login" state={{ from: location }} replace />
+    return <Navigate to="/login" state={{ path: location.pathname }} replace />
   }
   return children
 }

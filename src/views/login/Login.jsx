@@ -1,11 +1,11 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Alert, Avatar, Box, Collapse, Container, Link, IconButton, Typography } from "@mui/material"
 import { AccountCircle, Close } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
 
 import { Form, Formik } from "formik"
-import { Link as RouterLink } from "react-router-dom"
+import { Link as RouterLink, useLocation } from "react-router-dom"
 
 import { useAuth } from "../../contexts/authContext"
 
@@ -17,9 +17,20 @@ import TextFieldForm from "../../components/TextFieldForm"
 
 export default function Login() {
   const [_, handleAuth] = useAuth()
+  const { state } = useLocation()
 
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  async function login() {
+    try {
+      const { data } = await authService.myself()
+      handleAuth(data, state?.path)
+    } catch (err) {
+      console.error(err)
+      handleAuth(false)
+    }
+  }
 
   async function handleSubmit(values) {
     setLoading(true)
@@ -35,15 +46,19 @@ export default function Login() {
 
         http.defaults.headers["Authorization"] = "Bearer " + res.data.access
 
-        const { data } = await authService.myself()
-        handleAuth(data)
+        login()
       }
     } catch (err) {
       setOpen(true)
-    } finally {
-      setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (localStorage.getItem("refreshToken")) {
+      setLoading(true)
+      login()
+    }
+  }, [])
 
   return (
     <Container component="main" maxWidth="sm">

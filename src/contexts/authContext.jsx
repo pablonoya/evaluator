@@ -1,35 +1,23 @@
 import { createContext, useState, useContext, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router"
-
-import authService from "../services/authService"
+import { useNavigate } from "react-router"
 
 const AuthContext = createContext(undefined)
 
 const AuthProvider = props => {
-  const [auth, setAuth] = useState()
+  const [auth, setAuth] = useState(false)
   const navigate = useNavigate()
-  const location = useLocation()
-
-  const from = location.state?.from?.pathname || "/"
 
   useEffect(() => {
     if (location.pathname === "/restablecer") {
       handleAuth(false)
       return
     }
-
-    if (localStorage.getItem("refreshToken")) {
-      authService
-        .myself()
-        .then(res => handleAuth(res.data))
-        .catch(() => handleAuth(false))
-    }
   }, [])
 
-  function handleAuth(userInfo) {
+  function handleAuth(userInfo, navigateTo) {
     if (userInfo) {
       setAuth(userInfo)
-      navigate(from, { replace: true })
+      if (navigateTo) navigate(navigateTo, { replace: true })
     } else {
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")
