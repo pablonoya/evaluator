@@ -14,6 +14,7 @@ import SearchInput from "../../components/SearchInput"
 
 import { useAuth } from "../../contexts/authContext"
 import { filterItemsByGroups } from "../../utils"
+import WithRole from "../../components/WithRole"
 
 function topicsCell(params) {
   return <TopicChips topics={params.row.assignments} />
@@ -126,19 +127,22 @@ export default function Tasks(props) {
                 startIcon={<Refresh />}
                 loading={loading}
                 loadingPosition="start"
-                onClick={getAll}
+                onClick={() => getAll()}
               >
                 Actualizar
               </LoadingButton>
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                component={RouterLink}
-                to="tareas/crear"
-                disableElevation
-              >
-                Nuevo
-              </Button>
+
+              <WithRole role="Docente">
+                <Button
+                  variant="contained"
+                  startIcon={<Add />}
+                  component={RouterLink}
+                  to="crear"
+                  disableElevation
+                >
+                  Nuevo
+                </Button>
+              </WithRole>
             </Box>
           </Grid>
         </Grid>

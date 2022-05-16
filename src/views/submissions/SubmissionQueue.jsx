@@ -42,7 +42,6 @@ export default function SubmissionQueue(props) {
   }
 
   function connectWebSocket() {
-    console.log(ws.current?.url)
     ws.current = new WebSocket("ws://localhost:8000/ws/submissions/")
 
     ws.current.onmessage = handleOnMessage

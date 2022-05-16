@@ -16,6 +16,7 @@ import { filterItemsByGroups } from "../../utils"
 
 import FormDialog from "./FormDialog"
 import SearchInput from "../../components/SearchInput"
+import WithRole from "../../components/WithRole"
 
 const initialFormValues = {
   name: "",
@@ -175,9 +176,11 @@ export default function Exercises(props) {
               >
                 Actualizar
               </LoadingButton>
-              <Button variant="contained" onClick={handleNew} disableElevation>
-                + Nuevo
-              </Button>
+              <WithRole role="Docente">
+                <Button variant="contained" onClick={handleNew} disableElevation>
+                  + Nuevo
+                </Button>
+              </WithRole>
             </Box>
           </Grid>
         </Grid>
