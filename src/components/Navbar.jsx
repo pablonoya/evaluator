@@ -36,12 +36,6 @@ const items = [
     groups: ["Alumnos", "Docente"],
   },
   {
-    icon: <Send />,
-    name: "Mis envíos",
-    route: "/mis-envios",
-    groups: ["Alumnos"],
-  },
-  {
     icon: <Group />,
     name: "Estudiantes",
     route: "/estudiantes",
@@ -51,7 +45,6 @@ const items = [
     icon: <Send />,
     name: "Envíos",
     route: "/envios",
-    groups: ["Docente"],
   },
   {
     icon: <BarChart />,
