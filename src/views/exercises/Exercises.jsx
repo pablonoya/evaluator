@@ -1,32 +1,22 @@
 import { useState, useEffect } from "react"
 import { Link as RouterLink } from "react-router-dom"
 
-import { Container, Grid, Typography } from "@material-ui/core"
-import { Create, Delete, Refresh } from "@mui/icons-material"
-import { Button, IconButton, Link } from "@mui/material"
+import { Button, IconButton, Link, Container, Grid, Box, Typography } from "@mui/material"
 import LoadingButton from "@mui/lab/LoadingButton"
-import { Box } from "@mui/system"
+
+import { Create, Delete, Refresh } from "@mui/icons-material"
 
 import exerciseService from "../../services/exerciseService"
 
-import DataTable from "../../components/DataTable"
-import TopicChips from "../../components/TopicChips"
 import { useAuth } from "../../contexts/authContext"
 import { filterItemsByGroups } from "../../utils"
 
-import FormDialog from "./FormDialog"
+import DataTable from "../../components/DataTable"
+import TopicChips from "../../components/TopicChips"
 import SearchInput from "../../components/SearchInput"
 import WithRole from "../../components/WithRole"
 
-const initialFormValues = {
-  name: "",
-  topics: [],
-  description: "",
-  input_examples: "",
-  output_examples: "",
-}
-
-function topicsCell(params) {
+function TopicsCell(params) {
   return <TopicChips topics={params.row.topics} />
 }
 
@@ -56,10 +46,6 @@ export default function Exercises(props) {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
 
-  const [open, setOpen] = useState(false)
-
-  const [editing, setEditing] = useState(false)
-  const [formValues, setFormValues] = useState(initialFormValues)
   const [auth] = useAuth()
 
   const columns = filterItemsByGroups(
@@ -82,7 +68,7 @@ export default function Exercises(props) {
         headerName: "Temas",
         flex: 0.5,
         sortable: true,
-        renderCell: topicsCell,
+        renderCell: TopicsCell,
       },
       {
         field: "action",
@@ -99,12 +85,12 @@ export default function Exercises(props) {
   async function getAllExercises(query) {
     setLoading(true)
     try {
-      const res = await exerciseService.getAll({
+      const { data } = await exerciseService.getAll({
         page: page,
         page_size: pageSize,
         ...(query && { search: query }),
       })
-      setData(res.data)
+      setData(data)
     } catch (err) {
       showNotification("error", err.toString())
     } finally {
@@ -117,7 +103,7 @@ export default function Exercises(props) {
       const { status } = await exerciseService.delete(id)
 
       if (status === 204) {
-        showNotification("success", `Ejercicio ${res.data.name} eliminado`)
+        showNotification("info", `Ejercicio eliminado`)
         getAllExercises()
       }
     } catch (err) {
@@ -125,28 +111,14 @@ export default function Exercises(props) {
     }
   }
 
-  function handleNew() {
-    setFormValues(initialFormValues)
-    setEditing(false)
-    setOpen(true)
-  }
-
   function actionsCell(params) {
-    const onClickEdit = () => {
-      setFormValues(params.row)
-      setEditing(true)
-      setOpen(true)
-    }
-    const onClickDelete = () => {
-      deleteExercise(params.row.id)
-    }
-
     return (
       <>
-        <IconButton onClick={onClickEdit}>
+        <IconButton component={RouterLink} to={{ pathname: `${params.row.id}/editar` }}>
           <Create />
         </IconButton>
-        <IconButton color="error" onClick={onClickDelete}>
+
+        <IconButton color="error" onClick={() => deleteExercise(params.row.id)}>
           <Delete />
         </IconButton>
       </>
@@ -177,7 +149,7 @@ export default function Exercises(props) {
                 Actualizar
               </LoadingButton>
               <WithRole role="Docente">
-                <Button variant="contained" onClick={handleNew} disableElevation>
+                <Button variant="contained" component={RouterLink} to={{ pathname: "crear" }}>
                   + Nuevo
                 </Button>
               </WithRole>
@@ -195,16 +167,6 @@ export default function Exercises(props) {
         onPageChange={page => setPage(page + 1)}
         pageSize={pageSize}
         onPageSizeChange={size => setPageSize(size)}
-      />
-
-      <FormDialog
-        open={open}
-        editing={editing}
-        taskId={taskId}
-        formValues={formValues}
-        handleClose={() => setOpen(false)}
-        getAllExercises={getAllExercises}
-        showNotification={showNotification}
       />
     </Container>
   )

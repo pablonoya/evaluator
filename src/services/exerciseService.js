@@ -29,14 +29,6 @@ class ExcerciseService {
     return http.delete(`${this.url + id}/`)
   }
 
-  getAllWithoutTask(params) {
-    return http.get(`${this.url}get_all_without_task/`, { params: params })
-  }
-
-  lottery(data) {
-    return http.post(`${this.url}lottery/`, data)
-  }
-
   updateTask(data) {
     return http.put(`${this.url}update_task/`, data)
   }

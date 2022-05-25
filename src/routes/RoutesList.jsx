@@ -7,6 +7,7 @@ import Tasks from "../views/tasks/Tasks"
 import TaskForm from "../views/tasks/TaskForm"
 
 import Exercises from "../views/exercises/Exercises"
+import ExerciseForm from "../views/exercises/ExerciseForm"
 import SubmitExercise from "../views/submitExercise/SubmitExercise"
 
 import Submissions from "../views/submissions/Submissions"
@@ -61,7 +62,26 @@ export default function RoutesList(props) {
         />
       </Route>
 
-      <Route path="ejercicios" element={<Exercises showNotification={showNotification} />} />
+      <Route path="ejercicios">
+        <Route index element={<Exercises showNotification={showNotification} />} />
+        <Route
+          path=":exerciseId/editar"
+          element={
+            <RouteWithRole role="Docente" redirect="/tareas">
+              <ExerciseForm showNotification={showNotification} />
+            </RouteWithRole>
+          }
+        />
+        <Route
+          path="crear"
+          element={
+            <RouteWithRole role="Docente" redirect="/tareas">
+              <ExerciseForm showNotification={showNotification} />
+            </RouteWithRole>
+          }
+        />
+      </Route>
+
       <Route path="envios" element={<Submissions showNotification={showNotification} />} />
       <Route path="perfil" element={<Profile showNotification={showNotification} />} />
       <Route

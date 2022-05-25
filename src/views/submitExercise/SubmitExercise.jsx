@@ -2,27 +2,51 @@ import { useEffect, useState } from "react"
 import { useParams } from "react-router"
 import { useNavigate } from "react-router-dom"
 
-import { Grid, Box, Card, TextField, Typography, Button, Container } from "@mui/material"
+import { Grid, Box, Card, Typography, Button, Container } from "@mui/material"
 
 import exerciseService from "../../services/exerciseService"
 import CodeEditor from "../../components/CodeEditor"
+import DataTable from "../../components/DataTable"
+const columns = [
+  {
+    field: "input_example",
+    headerName: "Ejemplo de entrada",
+    sortable: false,
+    flex: 0.5,
+    renderCell: params => (
+      <div>
+        <Typography variant="body1" component="pre">
+          {params.row.input_example}
+        </Typography>
+      </div>
+    ),
+  },
+  {
+    field: "output_example",
+    headerName: "Ejemplo de salida",
+    sortable: false,
+    flex: 0.5,
+    renderCell: params => (
+      <Typography variant="body1" component="pre" style={{ verticalAlign: "top" }}>
+        {params.row.output_example}
+      </Typography>
+    ),
+  },
+]
 
 export default function SubmitExercise(props) {
   const { showNotification } = props
 
-  const { taskId, exerciseId } = useParams()
   const navigate = useNavigate()
+  const { taskId, exerciseId } = useParams()
 
   const [code, setCode] = useState("")
-  const [exercise, setExercise] = useState({
-    input_examples_min: "",
-    output_examples_min: "",
-  })
+  const [exercise, setExercise] = useState({})
 
   async function getExercise(exerciseId) {
     try {
-      const res = await exerciseService.get(exerciseId)
-      setExercise(res.data)
+      const { data } = await exerciseService.get(exerciseId)
+      setExercise(data)
     } catch (err) {
       showNotification("error", err.toString())
     }
@@ -62,9 +86,9 @@ export default function SubmitExercise(props) {
         <Grid item xs={5}>
           <Grid container justifyContent="flex-end">
             <Box sx={{ "& > button": { ml: 1, mr: "auto" } }}>
-              <Button onClick={() => navigate(-1)}>Cancelar</Button>
+              <Button onClick={() => navigate(-1)}>Atrás</Button>
               <Button variant="contained" onClick={() => handleSubmit()}>
-                Subir
+                Enviar
               </Button>
             </Box>
           </Grid>
@@ -81,26 +105,19 @@ export default function SubmitExercise(props) {
               </Typography>
             </Grid>
             <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <TextField
-                    multiline
-                    label="Ejemplos de entrada"
-                    value={exercise.input_examples_min}
-                    fullWidth
-                    readOnly
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    multiline
-                    label="Ejemplos de salida"
-                    value={exercise.output_examples_min}
-                    fullWidth
-                    readOnly
-                  />
-                </Grid>
-              </Grid>
+              <DataTable
+                columns={columns}
+                rows={exercise.testcases_min}
+                sx={{ "& .MuiDataGrid-cell": { display: "inline" } }}
+                getRowHeight={({ model }) => {
+                  const input_lines = model.input_example.split("\n")?.length
+                  const output_lines = model.output_example.split("\n")?.length
+
+                  return 26 * Math.max(input_lines, output_lines, 2)
+                }}
+                components={{ Toolbar: null, Footer: "null" }}
+                disableColumnMenu
+              />
             </Grid>
           </Grid>
         </Grid>
