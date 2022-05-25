@@ -12,6 +12,7 @@ app_name = "evaluator"
 router = routers.DefaultRouter()
 
 router.register(r"exercises", views.ExerciseView, "exercise")
+router.register(r"testcases", views.TestcaseView, "testcase")
 router.register(r"tasks", views.TaskView, "task")
 router.register(r"topics", views.TopicView, "topic")
 router.register(r"assignments", views.AssignmentView, "assignment")

@@ -26,18 +26,19 @@ class Assignment(models.Model):
     exercises_number = models.IntegerField(default=0)
 
 
+class Testcase(models.Model):
+    input_example = models.TextField()
+    output_example = models.TextField()
+
+
 class Exercise(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    input_examples = models.TextField()
-    output_examples = models.TextField()
     topics = models.ManyToManyField(Topic)
+    testcases = models.ManyToManyField(Testcase)
 
-    def input_examples_min(self):
-        return "\n".join(self.input_examples.split("\n")[:5])
-
-    def output_examples_min(self):
-        return "\n".join(self.output_examples.split("\n")[:5])
+    def testcases_min(self):
+        return self.testcases.all()[:3]
 
     def __str__(self):
         return self.name

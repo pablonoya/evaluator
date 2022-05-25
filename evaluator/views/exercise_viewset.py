@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import filters
 
-from evaluator.models import Exercise, Practice, Submission, Task
+from evaluator.models import Exercise, Submission, Task
 from evaluator.serializers import ExerciseSerializer
 
 from evaluator.utils import (
@@ -75,16 +75,22 @@ class ExerciseView(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset().get(id=pk)
+        fields = [
+            "id",
+            "name",
+            "topics",
+            "description",
+        ]
+        is_teacher = request.user.groups.filter(name="Docente").exists()
+
+        if is_teacher:
+            fields += ["testcases"]
+        else:
+            fields += ["testcases_min"]
+
         serializer = self.get_serializer(
             queryset,
-            fields=[
-                "id",
-                "name",
-                "topics",
-                "description",
-                "input_examples_min",
-                "output_examples_min",
-            ],
+            fields=fields,
         )
 
         return Response(serializer.data)
@@ -93,11 +99,9 @@ class ExerciseView(viewsets.ModelViewSet):
         queryset = self.get_queryset()
 
         fields = ["id", "name", "topics"]
-        is_teacher = request.user.groups.filter(name="Docente").exists()
+        is_student = request.user.groups.filter(name="Alumnos").exists()
 
-        if is_teacher:
-            fields += ["description", "input_examples", "output_examples"]
-        else:
+        if is_student:
             fields += ["task", "task_id", "practice_id"]
 
         page = self.paginate_queryset(queryset)

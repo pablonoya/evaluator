@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Assignment, Submission, Task, Exercise, Topic
+from .models import Assignment, Submission, Task, Exercise, Testcase, Topic
 
 from django.contrib.auth.models import Group, User
 
@@ -18,6 +18,19 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
             existing = set(self.fields)
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
+
+
+class TestcaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Testcase
+        fields = "__all__"
+
+    def create(self, validated_data):
+        instance = Testcase.objects.create(**validated_data)
+        instance.exercise_set.set([self.initial_data["exercise_id"]])
+        print(instance)
+
+        return instance
 
 
 class TopicSerializer(serializers.ModelSerializer):
@@ -143,14 +156,21 @@ class SubmissionSerializer(DynamicFieldsModelSerializer):
 
 class ExerciseSerializer(DynamicFieldsModelSerializer):
     topics = TopicSerializer(many=True, read_only=False)
-    task = serializers.SerializerMethodField()
-    task_id = serializers.SerializerMethodField()
+    testcases = TestcaseSerializer(many=True, read_only=True)
+    testcases_min = TestcaseSerializer(many=True, read_only=True)
+
+    task = serializers.SerializerMethodField(read_only=True)
+    task_id = serializers.SerializerMethodField(read_only=True)
 
     def get_task(self, obj):
-        return obj.task
+        if hasattr(obj, "task"):
+            return obj.task
+        return None
 
     def get_task_id(self, obj):
-        return obj.task_id
+        if hasattr(obj, "task_id"):
+            return obj.task_id
+        return None
 
     class Meta:
         model = Exercise
@@ -160,10 +180,8 @@ class ExerciseSerializer(DynamicFieldsModelSerializer):
             "task",
             "task_id",
             "description",
-            "input_examples",
-            "output_examples",
-            "input_examples_min",
-            "output_examples_min",
+            "testcases",
+            "testcases_min",
             "topics",
         )
 
