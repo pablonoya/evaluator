@@ -29,6 +29,7 @@ def code_runner(source_code, exercise_id, task_id, user_id, timelimit="1s"):
 
     # Compilation fails
     if res.exit_code == 1:
+        print(res.output)
         container.remove(force=True)
         asyncio.run(
             send_websocket_message(
@@ -51,24 +52,24 @@ def code_runner(source_code, exercise_id, task_id, user_id, timelimit="1s"):
             )
         )
 
-        output = []
-        for test_case in exercise.input_examples.splitlines():
+        outputs = []
+        for testcase in exercise.testcases.all():
             # test every case within the time limit
             res = container.exec_run(
-                f"timeout {timelimit} bash -c './executable <<< \"{test_case}\"'",
+                f"""timeout {timelimit} bash -c './executable <<< \"{testcase.input_example}\"'""",
                 tty=True,
             )
 
             if res.exit_code == 124:
                 return TLE
 
-            output.append(res.output.decode("utf-8"))
+            outputs.append(res.output.decode("utf-8"))
 
-        score = calculate_score(output, exercise.output_examples)
+        score = calculate_score(exercise.output_examples(), outputs)
 
         # update submission
         submission.score = score
-        submission.output = "\n".join(output)
+        submission.output = ",".join(outputs)
         submission.save()
 
         veredict = ACCEPTED if score > 0.5 else WRONG_ANSWER
@@ -104,16 +105,20 @@ def prepare_container(source_code):
     return container
 
 
-def calculate_score(output, output_examples):
-    score = 0
-    output_examples_list = output_examples.splitlines()
+def calculate_score(output_examples, outputs):
+    score_total = Decimal("0")
+    for example, output in zip(output_examples, outputs):
+        score_case = Decimal("0")
+        example_lines = example.strip().split("\n")
+        output_lines = output.strip().split("\n")
 
-    for i, example in enumerate(output_examples_list):
-        if example.strip() == output[i].strip():
-            score += 1
+        for example_line, output_line in zip(example_lines, output_lines):
+            score_case += example_line == output_line
 
-    score /= len(output_examples_list)
-    return Decimal(str(score)) * Decimal("100.0")
+        score_total += score_case / len(example_lines)
+
+    score_total /= len(output_examples)
+    return score_total * Decimal("100.0")
 
 
 async def send_websocket_message(

@@ -182,6 +182,7 @@ class ExerciseSerializer(DynamicFieldsModelSerializer):
             "description",
             "testcases",
             "testcases_min",
+            "output_examples",
             "topics",
         )
 

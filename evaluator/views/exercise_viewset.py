@@ -103,6 +103,8 @@ class ExerciseView(viewsets.ModelViewSet):
 
         if is_student:
             fields += ["task", "task_id", "practice_id"]
+        else:
+            fields += ["output_examples"]
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -114,7 +116,7 @@ class ExerciseView(viewsets.ModelViewSet):
     @action(detail=True, methods=["GET"], name="get_outputs")
     def get_outputs(self, request, pk=None):
         queryset = self.get_queryset().get(id=pk)
-        return Response(queryset.output_examples)
+        return Response(queryset.output_examples())
 
     @action(detail=False, methods=["PUT"], name="update-task")
     def update_task(self, request, *args, **kwargs):

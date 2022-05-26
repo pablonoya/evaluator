@@ -40,6 +40,9 @@ class Exercise(models.Model):
     def testcases_min(self):
         return self.testcases.all()[:3]
 
+    def output_examples(self):
+        return self.testcases.values_list("output_example", flat=True)
+
     def __str__(self):
         return self.name
 
