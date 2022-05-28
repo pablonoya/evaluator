@@ -61,7 +61,8 @@ class Submission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     score = models.DecimalField(max_digits=4, decimal_places=1, default=0)
     source_code = models.TextField()
-    output = models.TextField()
+    outputs = models.JSONField(default=None)
+
     status = models.IntegerField(choices=Status.choices)
     submitted_at = models.DateTimeField(auto_now_add=True)
     evaluated_at = models.DateTimeField(null=True)

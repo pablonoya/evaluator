@@ -69,7 +69,7 @@ def code_runner(source_code, exercise_id, task_id, user_id, timelimit="1s"):
 
         # update submission
         submission.score = score
-        submission.output = ",".join(outputs)
+        submission.outputs = outputs
         submission.save()
 
         veredict = ACCEPTED if score > 0.5 else WRONG_ANSWER

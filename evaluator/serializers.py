@@ -145,7 +145,7 @@ class SubmissionSerializer(DynamicFieldsModelSerializer):
             "score",
             "status",
             "source_code",
-            "output",
+            "outputs",
             "date",
             "time",
             "datetime",
