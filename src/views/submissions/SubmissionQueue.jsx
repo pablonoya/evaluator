@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import { List, ListItem, Typography } from "@mui/material"
 
 import SubmissionCard from "./SubmissionCard"
+import { useAuth } from "../../contexts/authContext"
 
 let connectTimeout
 let millis = 250
@@ -12,9 +13,12 @@ export default function SubmissionQueue(props) {
   const ws = useRef(null)
 
   const [messages, setMessages] = useState([])
+  const [auth] = useAuth()
 
   function handleOnMessage(event) {
     const messageReceived = JSON.parse(event.data)
+
+    if (messageReceived.user != auth.id) return
 
     setMessages(messages => {
       const messageOld = messages.find(

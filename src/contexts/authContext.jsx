@@ -17,7 +17,7 @@ const AuthProvider = props => {
   function handleAuth(userInfo, navigateTo) {
     if (userInfo) {
       setAuth(userInfo)
-      if (navigateTo) navigate(navigateTo, { replace: true })
+      navigate(navigateTo || "/", { replace: true })
     } else {
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")
