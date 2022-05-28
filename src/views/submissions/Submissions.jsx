@@ -138,7 +138,7 @@ export default function Submissions(props) {
       <SubmissionDetail
         open={open}
         handleClose={() => setOpen(false)}
-        details={details}
+        submission={details}
         showNotification={showNotification}
       />
     </Container>
