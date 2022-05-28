@@ -63,7 +63,7 @@ def code_runner(source_code, exercise_id, task_id, user_id, timelimit="1s"):
             if res.exit_code == 124:
                 return TLE
 
-            outputs.append(res.output.decode("utf-8"))
+            outputs.append(res.output.decode("utf-8").replace("\r", ""))
 
         score = calculate_score(exercise.output_examples(), outputs)
 
@@ -113,7 +113,7 @@ def calculate_score(output_examples, outputs):
         output_lines = output.strip().split("\n")
 
         for example_line, output_line in zip(example_lines, output_lines):
-            score_case += example_line == output_line
+            score_case += int(example_line == output_line)
 
         score_total += score_case / len(example_lines)
 
