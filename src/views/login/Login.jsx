@@ -50,6 +50,8 @@ export default function Login() {
       }
     } catch (err) {
       setOpen(true)
+    } finally {
+      setLoading(false)
     }
   }
 

@@ -15,7 +15,7 @@ import TopicsDialog from "./TopicsDialog"
 
 import taskService from "../../services/taskService"
 
-function RemoveButton(props) {
+function ActionsCell(props) {
   return (
     <>
       <IconButton onClick={props.handleEdit}>
@@ -64,7 +64,7 @@ export default function TaskForm(props) {
       headerName: "Acciones",
       flex: 0.1,
       renderCell: params => (
-        <RemoveButton
+        <ActionsCell
           handleEdit={() => handleEdit(params)}
           handleRemove={() => handleRemove(params)}
         />

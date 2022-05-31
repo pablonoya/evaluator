@@ -1,5 +1,6 @@
 import pandas as pd
 import yagmail
+import traceback
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -181,7 +182,7 @@ def send_email(user, receiver):
         )
 
     except Exception as e:
-        print(e)
+        print(traceback.print_exception(e))
 
 
 def censor_email(email):

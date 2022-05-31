@@ -75,18 +75,11 @@ class ExerciseView(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset().get(id=pk)
-        fields = [
-            "id",
-            "name",
-            "topics",
-            "description",
-        ]
+        fields = ["id", "name", "topics", "description", "testcases_min"]
         is_teacher = request.user.groups.filter(name="Docente").exists()
 
         if is_teacher:
             fields += ["testcases"]
-        else:
-            fields += ["testcases_min"]
 
         serializer = self.get_serializer(
             queryset,
