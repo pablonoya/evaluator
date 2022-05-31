@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router"
 import { useNavigate } from "react-router-dom"
 
@@ -7,6 +7,10 @@ import { Grid, Box, Card, Typography, Button, Container } from "@mui/material"
 import exerciseService from "../../services/exerciseService"
 import CodeEditor from "../../components/CodeEditor"
 import DataTable from "../../components/DataTable"
+
+import DescriptionEditor from "./DescriptionEditor"
+import { Editor } from "@tinymce/tinymce-react"
+
 const columns = [
   {
     field: "input_example",
@@ -36,6 +40,8 @@ const columns = [
 
 export default function SubmitExercise(props) {
   const { showNotification } = props
+
+  const editorRef = useRef(null)
 
   const navigate = useNavigate()
   const { taskId, exerciseId } = useParams()
@@ -95,14 +101,18 @@ export default function SubmitExercise(props) {
         </Grid>
 
         <Grid item xs={6}>
-          <Grid container spacing={2}>
+          <Grid container spacing={4}>
             <Grid item xs={12}>
               <Typography variant="h6" paragraph>
                 Descripción
               </Typography>
-              {/* <Typography variant="body1" paragraph> */}
-              <div dangerouslySetInnerHTML={{ __html: exercise.description }}></div>
-              {/* </Typography> */}
+              <Editor
+                tinymceScriptSrc={"./tinymce/tinymce.min.js"}
+                onInit={(_, editor) => (editorRef.current = editor)}
+                value={exercise.description}
+                inline
+                disabled
+              />
             </Grid>
             <Grid item xs={12}>
               <DataTable

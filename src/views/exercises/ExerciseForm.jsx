@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { Formik, Form } from "formik"
+import { Formik, Form, useField } from "formik"
 
 import { Container, Grid, Button, Typography, IconButton } from "@mui/material"
 import { Add, Clear, Create } from "@mui/icons-material"
@@ -13,6 +13,7 @@ import TopicsAutocomplete from "../../components/TopicsAutocomplete"
 import DataTable from "../../components/DataTable"
 
 import TestCaseDialog from "./TestCaseDialog"
+import DescriptionEditor from "./DescriptionEditor"
 
 function ActionsCell(props) {
   return (
@@ -66,7 +67,6 @@ export default function ExerciseForm(props) {
       ),
     },
   ]
-
   const navigate = useNavigate()
 
   const [exerciseData, setExerciseData] = useState({
@@ -162,20 +162,19 @@ export default function ExerciseForm(props) {
                 showNotification={showNotification}
               />
             </Grid>
+
             <Grid item xs={12}>
-              <TextFieldForm
-                multiline
-                name="description"
-                label="Descripción"
-                minRows={3}
-                maxRows={15}
-              />
+              <Typography variant="h6" paragraph>
+                Descripción
+              </Typography>
+
+              <DescriptionEditor value={exerciseData.description} />
             </Grid>
 
             <Grid item xs={12}>
               <Grid container spacing={2} justifyContent="space-between" sx={{ py: 1 }}>
                 <Grid item xs={7}>
-                  <Typography variant="body">Casos de prueba</Typography>
+                  <Typography variant="h6">Casos de prueba</Typography>
                 </Grid>
                 <Grid item>
                   <Button variant="outlined" startIcon={<Add />} onClick={createTestCase}>
