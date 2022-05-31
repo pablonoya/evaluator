@@ -8,7 +8,7 @@ import TaskForm from "../views/tasks/TaskForm"
 
 import Exercises from "../views/exercises/Exercises"
 import ExerciseForm from "../views/exercises/ExerciseForm"
-import SubmitExercise from "../views/submitExercise/SubmitExercise"
+import SubmitExercise from "../views/exercises/SubmitExercise"
 
 import Submissions from "../views/submissions/Submissions"
 

@@ -100,9 +100,9 @@ export default function SubmitExercise(props) {
               <Typography variant="h6" paragraph>
                 Descripción
               </Typography>
-              <Typography variant="body1" paragraph>
-                {exercise.description}
-              </Typography>
+              {/* <Typography variant="body1" paragraph> */}
+              <div dangerouslySetInnerHTML={{ __html: exercise.description }}></div>
+              {/* </Typography> */}
             </Grid>
             <Grid item xs={12}>
               <DataTable
