@@ -24,9 +24,9 @@ from evaluator.utils import (
 
 def report_success(job, connection, result, *args, **kwargs):
     submission = Submission.objects.filter(
-        exercise=job.meta["exercise_id"],
-        task=job.meta["task_id"],
-        user=job.meta["user_id"],
+        task_id=job.meta["task_id"],
+        exercise_id=job.meta["exercise_id"],
+        user_id=job.meta["user_id"],
     )
     submission.update(
         status=result,
@@ -151,10 +151,15 @@ class ExerciseView(viewsets.ModelViewSet):
 
         if job.is_queued:
             Submission.objects.update_or_create(
-                exercise=exercise,
+                exercise_id=exercise,
                 task_id=task_id,
-                user=user,
-                defaults={"score": 0, "source_code": source_code, "status": 1},
+                user_id=user,
+                defaults={
+                    "score": 0,
+                    "source_code": source_code,
+                    "status": 1,
+                    "outputs": [],
+                },
             )
 
             asyncio.run(

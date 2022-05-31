@@ -41,10 +41,10 @@ def code_runner(source_code, exercise_id, task_id, user_id, timelimit="1s"):
     # Review exercise
     try:
         submission, _ = Submission.objects.update_or_create(
-            exercise=exercise_id,
-            task=task_id,
-            user=user_id,
-            defaults={"score": 0, "status": REVIEW},
+            task_id=task_id,
+            exercise_id=exercise_id,
+            user_id=user_id,
+            defaults={"score": 0, "status": REVIEW, "outputs": []},
         )
         asyncio.run(
             send_websocket_message(
