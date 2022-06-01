@@ -12,7 +12,7 @@ export default function DescriptionEditor(props) {
 
   return (
     <Editor
-      tinymceScriptSrc={"./tinymce/tinymce.min.js"}
+      tinymceScriptSrc="/tinymce/tinymce.min.js"
       onInit={(_, editor) => (editorRef.current = editor)}
       textareaName="description"
       onEditorChange={stringifiedHtmlValue => {
