@@ -2,14 +2,12 @@ import { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router"
 import { useNavigate } from "react-router-dom"
 
+import { Editor } from "@tinymce/tinymce-react"
 import { Grid, Box, Card, Typography, Button, Container } from "@mui/material"
 
 import exerciseService from "../../services/exerciseService"
 import CodeEditor from "../../components/CodeEditor"
 import DataTable from "../../components/DataTable"
-
-import DescriptionEditor from "./DescriptionEditor"
-import { Editor } from "@tinymce/tinymce-react"
 
 const columns = [
   {
@@ -107,7 +105,7 @@ export default function SubmitExercise(props) {
                 Descripción
               </Typography>
               <Editor
-                tinymceScriptSrc={"./tinymce/tinymce.min.js"}
+                tinymceScriptSrc="/tinymce/tinymce.min.js"
                 onInit={(_, editor) => (editorRef.current = editor)}
                 value={exercise.description}
                 inline
