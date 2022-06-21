@@ -20,16 +20,16 @@ class Migration(migrations.Migration):
             name='score',
             field=models.DecimalField(decimal_places=1, default=0, max_digits=3),
         ),
+        migrations.CreateModel(
+            name='Assignment',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('exercises_number', models.IntegerField(default=0)),
+                ('task', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='evaluator.task')),
+                ('topic', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='evaluator.topic')),
+            ],
+        ),
         migrations.SeparateDatabaseAndState(state_operations=[
-            migrations.CreateModel(
-                name='Assignment',
-                fields=[
-                    ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                    ('exercises_number', models.IntegerField(default=0)),
-                    ('task', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='evaluator.task')),
-                    ('topic', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='evaluator.topic')),
-                ],
-            ),
             migrations.AlterField(
                 model_name='task',
                 name='topics',
