@@ -50,9 +50,7 @@ export default function FormDialog(props) {
     <Dialog open={open} onClose={handleClose} maxWidth="sm" scroll="body">
       <Formik initialValues={formValues} onSubmit={handleSubmit}>
         <Form>
-          <DialogTitle>
-            {editing ? "Editar " + formValues.first_name : "Nuevo estudiante"}
-          </DialogTitle>
+          <DialogTitle>{editing ? "Editar" : "Nuevo"} estudiante</DialogTitle>s
           <DialogContent>
             <DialogContentText>Ingrese los datos del estudiante.</DialogContentText>
             <Grid container spacing={2}>
@@ -83,7 +81,6 @@ export default function FormDialog(props) {
               </Grid>
             </Grid>
           </DialogContent>
-
           <DialogActions>
             <Button onClick={handleClose}>Cancelar</Button>
             <Button variant="contained" type="submit">

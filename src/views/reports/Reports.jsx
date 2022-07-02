@@ -49,10 +49,10 @@ export default function Reports(props) {
   const { showNotification } = props
 
   const [data, setData] = useState(null)
-  const [report, setReport] = useState(null)
+  const [report, setReport] = useState(reportList[1])
 
   const [loading, setLoading] = useState(false)
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(10)
 
   async function prepareDynamicColumns() {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 
-import { Button, Grid, IconButton, Typography } from "@mui/material"
+import { Button, Container, Grid, IconButton, Typography } from "@mui/material"
 import { Box } from "@mui/system"
 import { Add, Create, Delete, Refresh } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
@@ -94,7 +94,7 @@ export default function Topics(props) {
   }, [page, pageSize])
 
   return (
-    <div>
+    <Container component="main">
       <Grid container>
         <Grid item xs={5}>
           <Typography variant="h5">Temas</Typography>
@@ -147,6 +147,6 @@ export default function Topics(props) {
         getTopics={getTopics}
         showNotification={showNotification}
       />
-    </div>
+    </Container>
   )
 }

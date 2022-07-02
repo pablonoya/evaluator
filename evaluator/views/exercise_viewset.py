@@ -151,7 +151,7 @@ class ExerciseView(viewsets.ModelViewSet):
 
         if job.is_queued:
             Submission.objects.update_or_create(
-                exercise_id=exercise,
+                exercise_id=exercise.id,
                 task_id=task_id,
                 user_id=user,
                 defaults={

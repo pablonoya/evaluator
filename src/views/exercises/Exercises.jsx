@@ -21,11 +21,13 @@ function TopicsCell(params) {
 }
 
 function NameCell({ row }) {
-  return (
-    <Link component={RouterLink} to={`/enviar/${row.task_id}/${row.id}`} color="inherit">
-      {row.name}
-    </Link>
-  )
+  if (row.task_id)
+    return (
+      <Link component={RouterLink} to={`/enviar/${row.task_id}/${row.id}`} color="inherit">
+        {row.name}
+      </Link>
+    )
+  return row.name
 }
 
 function TaskCell({ row }) {
@@ -132,12 +134,12 @@ export default function Exercises(props) {
   return (
     <Container>
       <Grid container>
-        <Grid item xs={5}>
+        <Grid item xs={4}>
           <Typography variant="h5">Ejercicios</Typography>
         </Grid>
-        <Grid item xs={7}>
+        <Grid item xs={8}>
           <Grid container justifyContent="flex-end">
-            <Box sx={{ "& > button": { ml: 1, mb: 1 } }}>
+            <Box sx={{ "& > button, a": { ml: 1, mb: 1 } }}>
               <SearchInput callback={getAllExercises} placeholder="Buscar por nombre..." />
               <LoadingButton
                 variant="outlined"

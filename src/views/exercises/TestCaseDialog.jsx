@@ -7,8 +7,7 @@ import TextFieldForm from "../../components/TextFieldForm"
 import testcaseService from "../../services/testcaseService"
 
 export default function TestCaseDialog(props) {
-  const { showNotification, handleClose, open, editing, exerciseId, testcaseData, getExercise } =
-    props
+  const { handleClose, open, editing, exerciseId, testcaseData, getExercise } = props
 
   async function handleSubmit(values) {
     const data = { ...values, exercise_id: exerciseId }
@@ -21,8 +20,6 @@ export default function TestCaseDialog(props) {
       getExercise(exerciseId)
       handleClose()
     }
-
-    console.log(res)
   }
 
   return (
