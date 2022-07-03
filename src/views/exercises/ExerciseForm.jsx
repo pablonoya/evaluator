@@ -36,8 +36,8 @@ export default function ExerciseForm(props) {
       field: "input_example",
       headerName: "Ejemplo de entrada",
       flex: 0.44,
-      sortable: false,
-      filterable: false,
+      headerAlign: "left",
+      type: "actions",
       renderCell: params => (
         <div>
           <Typography variant="body1" component="pre">
@@ -50,8 +50,8 @@ export default function ExerciseForm(props) {
       field: "output_example",
       headerName: "Ejemplo de salida",
       flex: 0.44,
-      sortable: false,
-      filterable: false,
+      headerAlign: "left",
+      type: "actions",
       renderCell: params => (
         <Typography variant="body1" component="pre" style={{ verticalAlign: "top" }}>
           {params.row.output_example}

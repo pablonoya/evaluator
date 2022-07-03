@@ -1,12 +1,8 @@
-/** @jsxImportSource @emotion/react */
 import { useState, useEffect } from "react"
-
-import { css } from "@emotion/react"
 
 import {
   Button,
   Card,
-  CardContent,
   Dialog,
   DialogActions,
   DialogContent,
@@ -19,68 +15,84 @@ import { red, green, grey } from "@mui/material/colors"
 
 import exerciseService from "../../services/exerciseService"
 import CodeEditor from "../../components/CodeEditor"
+import DataTable from "../../components/DataTable"
+
+const columns = [
+  {
+    headerName: "Salida correcta",
+    field: "output",
+    headerAlign: "left",
+    type: "actions",
+    flex: 0.5,
+
+    renderCell: params => (
+      <Typography variant="body1" component="pre" style={{ verticalAlign: "top" }}>
+        {params.row.output}
+      </Typography>
+    ),
+  },
+  {
+    headerName: "Salida enviada",
+    field: "submitted",
+    headerAlign: "left",
+    type: "actions",
+    flex: 0.5,
+    renderCell: params => (
+      <Typography variant="body1" component="pre" style={{ verticalAlign: "top" }}>
+        {params.row.submitted}
+      </Typography>
+    ),
+  },
+]
 
 export default function SubmissionDetail(props) {
   const { open, handleClose, submission, showNotification } = props
 
-  const [outputExamples, setOutputExamples] = useState()
+  const [rows, setRows] = useState([])
+  const [page, setPage] = useState(0)
+  const [pageSize, setPageSize] = useState(10)
 
   async function getOutputs(id) {
     try {
       const { data } = await exerciseService.getOutputs(id)
-      setOutputExamples(data)
+
+      const dataRows = data.map((output, i) => ({
+        id: i,
+        output: output,
+        submitted: submission.outputs[i] || "",
+      }))
+
+      setRows(dataRows)
     } catch (err) {
       showNotification("error", err.toString())
     }
-  }
-
-  function styledOutput(example, output) {
-    const correct = example.split("\n")
-    const submitted = output.split("\n")
-
-    return correct.map((correctOutput, i) => (
-      <span
-        key={i}
-        style={{
-          backgroundColor: correctOutput.trim() === submitted[i]?.trim() ? green[100] : red[100],
-        }}
-      >
-        {submitted[i]}
-      </span>
-    ))
   }
 
   useEffect(() => {
     if (submission.exercise) {
       getOutputs(submission.exercise)
     }
-  }, [submission.exercise])
-
-  const styles = css`
-    font-family: "Roboto Mono";
-    margin-top: -1px;
-    border-top: 1px solid ${grey[400]};
-
-    span {
-      display: inline-block;
-      width: 100%;
-      padding-inline: 1rem;
-      padding-block: 0.1rem;
-      border-bottom: 1px solid ${grey[400]};
-    }
-    span:empty:before {
-      content: "\\200b";
-    }
-  `
+  }, [submission])
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="body" keepMounted>
-      <DialogTitle>{`${submission.exercise_name} por ${submission.student}`}</DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="body" fullWidth>
+      <DialogTitle>
+        <Grid container>
+          <Grid item xs={9}>
+            Ejercicio {submission.exercise_name} enviado por {submission.student}
+          </Grid>
+          <Grid item xs={3} justifyContent="end">
+            <Typography variant="h6" align="right">
+              Calificación: {submission.score}
+            </Typography>
+          </Grid>
+        </Grid>
+      </DialogTitle>
+
       <DialogContent>
         <DialogContentText>
-          Enviado el {submission.date} a las {submission.time}
+          Evaluado el {submission.date} a las {submission.time} <br />
         </DialogContentText>
-
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <Typography variant="subtitle1" paragraph>
@@ -97,36 +109,34 @@ export default function SubmissionDetail(props) {
               Salidas
             </Typography>
 
-            <Card variant="outlined">
-              <Grid container sx={{ borderBottom: 1, borderColor: "grey.300" }}>
-                <Grid item xs={6} sx={{ py: 1, px: 2 }}>
-                  Correctas
-                </Grid>
-                <Grid item xs={6} sx={{ py: 1, px: 2 }}>
-                  Enviadas
-                </Grid>
-              </Grid>
-              <CardContent style={{ maxHeight: "60vh", overflow: "auto" }} sx={{ p: 0 }}>
-                <Grid container>
-                  <Grid item xs={6}>
-                    {outputExamples?.map(example => (
-                      <p css={styles}>
-                        {example.split("\n").map((output, i) => (
-                          <span key={i}>{output}</span>
-                        ))}
-                      </p>
-                    ))}
-                  </Grid>
-                  <Grid item xs={6}>
-                    {submission.outputs &&
-                      outputExamples?.map((example, i) => (
-                        <p id="output" css={styles}>
-                          {styledOutput(example, submission.outputs[i])}
-                        </p>
-                      ))}
-                  </Grid>
-                </Grid>
-              </CardContent>
+            <Card
+              variant="outlined"
+              sx={{
+                "& .error": { bgcolor: red[100], "&:hover": { bgcolor: red[100] } },
+                "& .success": { bgcolor: green[100], "&:hover": { bgcolor: green[100] } },
+              }}
+            >
+              <DataTable
+                columns={columns}
+                rows={rows}
+                sx={{ "& .MuiDataGrid-cell": { display: "inline" } }}
+                getRowClassName={({ row }) =>
+                  row.output.trim() === row.submitted.trim() ? "success" : "error"
+                }
+                getRowHeight={({ model }) => {
+                  const output_lines = model.output.split("\n")?.length
+                  const submitted_lines = model.submitted.split("\n")?.length
+
+                  return 26 * Math.max(output_lines, submitted_lines, 2)
+                }}
+                paginationMode="client"
+                components={{ Toolbar: null }}
+                page={page}
+                pageSize={pageSize}
+                onPageChange={setPage}
+                onPageSizeChange={setPageSize}
+                disableSelectionOnClick
+              />
             </Card>
           </Grid>
         </Grid>
