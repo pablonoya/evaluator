@@ -33,7 +33,7 @@ class Testcase(models.Model):
 
 class Exercise(models.Model):
     name = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     topics = models.ManyToManyField(Topic)
     testcases = models.ManyToManyField(Testcase)
 

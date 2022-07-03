@@ -27,8 +27,8 @@ class TestcaseSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         instance = Testcase.objects.create(**validated_data)
-        instance.exercise_set.set([self.initial_data["exercise_id"]])
-        print(instance)
+        if self.initial_data["exercise_id"]:
+            instance.exercise_set.set([self.initial_data["exercise_id"]])
 
         return instance
 
@@ -189,9 +189,11 @@ class ExerciseSerializer(DynamicFieldsModelSerializer):
     def create(self, validated_data):
         validated_data.pop("topics")
         topic_ids = [topic["id"] for topic in self.initial_data["topics"]]
+        testcase_ids = [testcase["id"] for testcase in self.initial_data["testcases"]]
 
         instance = Exercise.objects.create(**validated_data)
         instance.topics.set(topic_ids)
+        instance.testcases.set(testcase_ids)
         instance.save()
 
         return instance

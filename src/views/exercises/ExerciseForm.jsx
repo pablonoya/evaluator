@@ -124,7 +124,10 @@ export default function ExerciseForm(props) {
           showNotification("success", `Ejercicio ${values.name} editado`)
         }
       } else {
-        const res = exerciseService.create(values)
+        const res = exerciseService.create({
+          ...values,
+          testcases: exerciseData.testcases,
+        })
 
         if (res.status == 201) {
           showNotification("success", `Ejercicio ${values.name} creado`)
@@ -151,7 +154,7 @@ export default function ExerciseForm(props) {
         <Form>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <TextFieldForm name="name" label="Nombre" />
+              <TextFieldForm name="name" label="Nombre" required />
             </Grid>
 
             <Grid item xs={12} sm={6}>
@@ -213,13 +216,13 @@ export default function ExerciseForm(props) {
       </Formik>
 
       <TestCaseDialog
-        showNotification={showNotification}
         handleClose={() => setOpenDialog(false)}
         open={openDialog}
         editing={editDialog}
         exerciseId={exerciseId}
         testcaseData={testcaseData}
         getExercise={getExercise}
+        setExerciseData={setExerciseData}
       />
     </Container>
   )

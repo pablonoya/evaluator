@@ -7,17 +7,25 @@ import TextFieldForm from "../../components/TextFieldForm"
 import testcaseService from "../../services/testcaseService"
 
 export default function TestCaseDialog(props) {
-  const { handleClose, open, editing, exerciseId, testcaseData, getExercise } = props
+  const { handleClose, open, editing, exerciseId, testcaseData, getExercise, setExerciseData } =
+    props
 
   async function handleSubmit(values) {
     const data = { ...values, exercise_id: exerciseId }
 
-    const { status } = await (editing
+    const res = await (editing
       ? testcaseService.update(testcaseData.id, data)
       : testcaseService.create(data))
 
-    if (status < 300) {
-      getExercise(exerciseId)
+    if (res.status < 300) {
+      if (!exerciseId) {
+        setExerciseData(exercise => {
+          exercise.testcases = [...exercise.testcases, res.data]
+          return exercise
+        })
+      } else {
+        getExercise(exerciseId)
+      }
       handleClose()
     }
   }
