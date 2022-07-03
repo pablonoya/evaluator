@@ -153,7 +153,7 @@ class ExerciseView(viewsets.ModelViewSet):
             Submission.objects.update_or_create(
                 exercise_id=exercise.id,
                 task_id=task_id,
-                user_id=user,
+                user_id=user.id,
                 defaults={
                     "score": 0,
                     "source_code": source_code,

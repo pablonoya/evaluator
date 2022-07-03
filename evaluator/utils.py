@@ -108,17 +108,10 @@ def prepare_container(source_code):
 def calculate_score(output_examples, outputs):
     score_total = Decimal("0")
     for example, output in zip(output_examples, outputs):
-        score_case = Decimal("0")
-        example_lines = example.strip().split("\n")
-        output_lines = output.strip().split("\n")
+        score_case = int(example.strip() == output.strip())
+        score_total += score_case
 
-        for example_line, output_line in zip(example_lines, output_lines):
-            score_case += int(example_line == output_line)
-
-        score_total += score_case / len(example_lines)
-
-    score_total /= len(output_examples)
-    return score_total * Decimal("100.0")
+    return score_total / len(output_examples) * Decimal("100.0")
 
 
 async def send_websocket_message(
