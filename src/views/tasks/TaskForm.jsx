@@ -148,11 +148,11 @@ export default function TaskForm(props) {
     <Container>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Typography variant="h5">{editing ? "Editar " + taskData.name : "Nueva tarea"}</Typography>
+          <Typography variant="h5">{editing ? "Editar " : "Nueva"} tarea</Typography>
         </Grid>
         <Grid item xs={12}>
           <DialogContentText>
-            Seleccione los temas y la cantidad deejercicios para esta tarea.
+            Seleccione los temas y la cantidad de ejercicios para esta tarea.
           </DialogContentText>
         </Grid>
       </Grid>
@@ -196,6 +196,7 @@ export default function TaskForm(props) {
                 columns={exercisesColumns}
                 rows={assignments}
                 rowCount={assignments.length}
+                disableSelectionOnClick
               />
             </Grid>
 
