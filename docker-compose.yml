@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    image: evaluator
+    command: poetry run ./manage.py runserver
+    container_name: 'evaluator-api'
+    network_mode: 'host'
+    volumes:
+      - .:/app
+
+  rqworker:
+    build: .
+    image: evaluator
+    container_name: 'evaluator-rqworker'
+    command: poetry run ./manage.py rqworker
+    network_mode: "host"
+    volumes:
+      - .:/app
+
+  frontend:
+    build: .
+    image: evaluator
+    container_name: 'evaluator-frontend'
+    command: yarn dev
+    network_mode: "host"
+    volumes:
+      - .:/app

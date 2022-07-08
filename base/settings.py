@@ -100,6 +100,7 @@ ASGI_APPLICATION = "base.asgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
+        "HOST": "127.0.0.1",
         "OPTIONS": {
             "read_default_file": os.path.join(BASE_DIR, "mysql.conf"),
         },
