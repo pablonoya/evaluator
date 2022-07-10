@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { Formik, Form, useField } from "formik"
+import { Formik, Form } from "formik"
 
 import { Container, Grid, Button, Typography, IconButton } from "@mui/material"
 import { Add, Clear, Create } from "@mui/icons-material"
@@ -14,6 +14,7 @@ import DataTable from "../../components/DataTable"
 
 import TestCaseDialog from "./TestCaseDialog"
 import DescriptionEditor from "./DescriptionEditor"
+import TestcaseImportButton from "./TestcaseImportButton"
 
 function ActionsCell(props) {
   return (
@@ -59,6 +60,7 @@ export default function ExerciseForm(props) {
       ),
     },
     {
+      field: "actions",
       headerName: "Acciones",
       type: "actions",
       flex: 0.12,
@@ -67,6 +69,7 @@ export default function ExerciseForm(props) {
       ),
     },
   ]
+
   const navigate = useNavigate()
 
   const [exerciseData, setExerciseData] = useState({
@@ -175,14 +178,27 @@ export default function ExerciseForm(props) {
             </Grid>
 
             <Grid item xs={12}>
-              <Grid container spacing={2} justifyContent="space-between" sx={{ py: 1 }}>
-                <Grid item xs={7}>
+              <Grid container sx={{ py: 1 }}>
+                <Grid item xs={5}>
                   <Typography variant="h6">Casos de prueba</Typography>
                 </Grid>
-                <Grid item>
-                  <Button variant="outlined" startIcon={<Add />} onClick={createTestCase}>
-                    Añadir
-                  </Button>
+                <Grid item xs={7}>
+                  <Grid container justifyContent="flex-end">
+                    <TestcaseImportButton
+                      exerciseId={exerciseId}
+                      getExercise={getExercise}
+                      setExerciseData={setExerciseData}
+                      showNotification={showNotification}
+                    />
+                    <Button
+                      variant="outlined"
+                      startIcon={<Add />}
+                      onClick={createTestCase}
+                      sx={{ ml: 1 }}
+                    >
+                      Añadir
+                    </Button>
+                  </Grid>
                 </Grid>
               </Grid>
 

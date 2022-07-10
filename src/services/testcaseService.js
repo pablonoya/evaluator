@@ -16,6 +16,12 @@ class TestcaseService {
   delete(id) {
     return http.delete(`${this.url + id}/`)
   }
+
+  upload(data) {
+    return http.post(this.url + "upload/", data, {
+      headers: { "content-type": "multipart/form-data" },
+    })
+  }
 }
 
 export default new TestcaseService()
