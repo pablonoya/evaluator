@@ -32,11 +32,12 @@ RUN apt-get update && apt-get install -y \
 
 
 RUN mkdir -p /app
-WORKDIR /app
 COPY . /app/
+WORKDIR /app
 
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-ENV PATH "$HOME/.poetry/bin:${PATH}"
+ENV PATH /root/.poetry/bin:${PATH}
+RUN poetry config virtualenvs.create false
 
 # Installing app dependencies
 RUN poetry install
