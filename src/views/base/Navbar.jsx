@@ -14,8 +14,8 @@ import {
 
 import { Home, Assignment, Send, Group, Topic, Description, BarChart } from "@mui/icons-material/"
 
-import { filterItemsByGroups } from "../utils"
-import { useAuth } from "../contexts/authContext"
+import { filterItemsByGroups } from "../../utils"
+import { useAuth } from "../../contexts/authContext"
 
 const items = [
   {

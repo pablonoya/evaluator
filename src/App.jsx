@@ -3,9 +3,8 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom"
 
 import { useAuth } from "./contexts/authContext"
 
-import Loading from "./components/Loading"
-const Navigation = lazy(() => import("./components/Navigation.jsx"))
-// import Navigation from "./components/Navigation"
+import Loading from "./views/base/Loading"
+const Navigation = lazy(() => import("./views/base/Navigation.jsx"))
 
 import Login from "./views/login/Login"
 import Restore from "./views/login/Restore"

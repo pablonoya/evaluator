@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom"
 
-import Home from "../views/Home"
+import Home from "../views/base/Home"
 import Profile from "../views/profile/Profile"
 
 import Tasks from "../views/tasks/Tasks"

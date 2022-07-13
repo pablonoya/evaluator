@@ -14,6 +14,7 @@ import authService from "../../services/authService"
 
 import PasswordFieldForm from "../../components/PaswordFieldForm"
 import TextFieldForm from "../../components/TextFieldForm"
+import Loading from "../base/Loading"
 
 export default function Login() {
   const [_, handleAuth] = useAuth()
@@ -55,12 +56,10 @@ export default function Login() {
     }
   }
 
-  useEffect(() => {
-    if (localStorage.getItem("refreshToken")) {
-      setLoading(true)
-      login()
-    }
-  }, [])
+  if (localStorage.getItem("refreshToken")) {
+    login()
+    return <Loading />
+  }
 
   return (
     <Container component="main" maxWidth="sm">

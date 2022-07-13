@@ -4,9 +4,9 @@ import { Box, Toolbar } from "@mui/material"
 
 import Header from "./Header"
 import Navbar from "./Navbar"
-import Notification from "./Notification"
+import Notification from "../../components/Notification"
 
-import RoutesList from "../routes/RoutesList"
+import RoutesList from "../../routes/RoutesList"
 
 const drawerWidth = 240
 

@@ -1,12 +1,39 @@
 import { useState } from "react"
 
-import { AppBar, IconButton, Menu, MenuItem, Toolbar, Typography } from "@mui/material"
+import { AppBar, Avatar, IconButton, Menu, MenuItem, Toolbar, Typography } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
 import { AccountCircle } from "@mui/icons-material"
 
 import { useNavigate } from "react-router-dom"
 
-import { useAuth } from "../contexts/authContext"
+import { useAuth } from "../../contexts/authContext"
+
+function stringToColor(string) {
+  let hash = 0
+  let i
+
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash)
+  }
+
+  let color = "#"
+
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff
+    color += `00${value.toString(16)}`.slice(-2)
+  }
+
+  return color
+}
+
+function stringAvatar(name) {
+  return {
+    sx: {
+      bgcolor: stringToColor(name),
+    },
+    children: name.toUpperCase()[0],
+  }
+}
 
 export default function Header(props) {
   const { drawerWidth, handleOpen } = props
@@ -65,7 +92,7 @@ export default function Header(props) {
               }}
               color="inherit"
             >
-              <AccountCircle />
+              <Avatar {...stringAvatar(auth.username)} />
             </IconButton>
             <Menu
               id="menu-appbar"
