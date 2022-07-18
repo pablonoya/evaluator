@@ -24,11 +24,16 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("evaluator/", include("evaluator.urls")),
-    re_path(
-        r"^assets/(?P<path>.*)$",
-        serve,
-        {"document_root": settings.STATIC_ROOT / "assets"},
-    ),
+    # re_path(
+    #     r"^assets/(?P<path>.*)$",
+    #     serve,
+    #     {"document_root": settings.STATIC_ROOT / "assets"},
+    # ),
+    # re_path(
+    #     r"^tinymce/(?P<path>.*)$",
+    #     serve,
+    #     {"document_root": settings.STATIC_ROOT / "tinymce"},
+    # ),
     re_path(r"^.*$", TemplateView.as_view(template_name="index.html")),
     # Django serves staticfiles hack, don't include it in production!
 ]

@@ -1,29 +1,31 @@
 version: "3.8"
 
 services:
-  api:
+  daphne:
     build: .
     image: evaluator
-    command: poetry run ./manage.py runserver
-    container_name: 'evaluator-api'
+    container_name: 'evaluator-daphne'
+    command: daphne base.asgi:application
     network_mode: 'host'
     volumes:
       - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
 
   rqworker:
     build: .
     image: evaluator
-    container_name: 'evaluator-rqworker'
+    container_name: 'evaluator-worker'
     command: poetry run ./manage.py rqworker
-    network_mode: "host"
+    network_mode: 'host'
     volumes:
       - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
 
-  frontend:
-    build: .
-    image: evaluator
-    container_name: 'evaluator-frontend'
-    command: yarn dev
-    network_mode: "host"
-    volumes:
-      - .:/app
+  # frontend:
+  #   build: .
+  #   image: evaluator
+  #   container_name: 'evaluator-frontend'
+  #   command: yarn dev
+  #   network_mode: 'host'
+  #   volumes:
+  #     - .:/app
