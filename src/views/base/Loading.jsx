@@ -3,18 +3,14 @@ import { CircularProgress, Typography } from "@mui/material"
 
 export default function Loading() {
   return (
-    <Box
-      sx={{
-        height: 200,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Typography variant="subtitle1" sx={{ mx: "auto" }}>
+    <Box>
+      <Typography align="center" variant="h5" my={4}>
         Iniciando el evaluador...
       </Typography>
-      <CircularProgress />
+
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <CircularProgress />
+      </Box>
     </Box>
   )
 }
