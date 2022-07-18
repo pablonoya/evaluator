@@ -27,18 +27,25 @@ RUN echo \
   "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
 RUN apt-get update && apt-get install -y \
-  docker-ce docker-ce-cli containerd.io \
+  docker-ce docker-ce-cli containerd.io docker-compose-plugin \
   yarn
-
-
-RUN mkdir -p /app
-COPY . /app/
-WORKDIR /app
 
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 ENV PATH /root/.poetry/bin:${PATH}
 RUN poetry config virtualenvs.create false
 
 # Installing app dependencies
-RUN poetry install
+RUN mkdir -p /app
+COPY ./package.json /app/package.json
+COPY ./yarn.lock /app/yarn.lock
+COPY ./pyproject.toml /app/pyproject.toml
+COPY ./poetry.lock /app/poetry.lock
+WORKDIR /app
+
 RUN yarn install
+RUN poetry install
+
+# Building app
+COPY . /app/
+RUN yarn build
+RUN echo yes | ./manage.py collectstatic

@@ -14,14 +14,10 @@ export default defineConfig({
       input: "./src/main.jsx",
     },
   },
-  resolve: {
-    alias: [
-      {
-        find: /^@mui\/icons-material\/(.*)/,
-        replacement: "@mui/icons-material/esm/$1",
-      },
-    ],
-  },
   root: "./src",
-  plugins: [react()],
+  plugins: [
+    react({
+      babel: { babelrc: true, compact: true },
+    }),
+  ],
 })
