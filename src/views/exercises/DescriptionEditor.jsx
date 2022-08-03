@@ -21,6 +21,9 @@ export default function DescriptionEditor(props) {
       initialValue={value}
       init={{
         menubar: false,
+        images_upload_base_path: "/img",
+        blobs_upload_base_path: "/img",
+        automatic_uploads: true,
         language: "es_MX",
         plugins: ["autolink", "lists", "image", "anchor", "code", "table", "preview"],
         toolbar:

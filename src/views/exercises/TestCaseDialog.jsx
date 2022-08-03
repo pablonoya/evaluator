@@ -11,7 +11,12 @@ export default function TestCaseDialog(props) {
     props
 
   async function handleSubmit(values) {
-    const data = { ...values, exercise_id: exerciseId }
+    // trim spaces and endlines
+    const data = {
+      input_example: values.input_example.replace(/\s\s*$/gm, ""),
+      output_example: values.output_example.replace(/\s\s*$/gm, ""),
+      exercise_id: exerciseId,
+    }
 
     const res = await (editing
       ? testcaseService.update(testcaseData.id, data)

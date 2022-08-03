@@ -166,6 +166,7 @@ export default function Exercises(props) {
         rows={data.results}
         rowCount={data.count}
         getRowId={row => row.id + `${row.task_id}`}
+        page={page - 1}
         onPageChange={page => setPage(page + 1)}
         pageSize={pageSize}
         onPageSizeChange={size => setPageSize(size)}

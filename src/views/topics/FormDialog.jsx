@@ -41,7 +41,7 @@ export default function FormDialog(props) {
           <DialogContent>
             <DialogContentText>Ingrese el nombre del tema</DialogContentText>
 
-            <TextFieldForm name="name" label="Nombres" />
+            <TextFieldForm name="name" label="Nombre" />
           </DialogContent>
 
           <DialogActions>

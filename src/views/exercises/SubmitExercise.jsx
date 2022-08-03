@@ -14,7 +14,7 @@ const columns = [
     field: "input_example",
     headerName: "Ejemplo de entrada",
     sortable: false,
-    flex: 0.5,
+    flex: 0.4,
     renderCell: params => (
       <div>
         <Typography variant="body1" component="pre">
@@ -27,7 +27,7 @@ const columns = [
     field: "output_example",
     headerName: "Ejemplo de salida",
     sortable: false,
-    flex: 0.5,
+    flex: 0.6,
     renderCell: params => (
       <Typography variant="body1" component="pre" style={{ verticalAlign: "top" }}>
         {params.row.output_example}
@@ -82,7 +82,7 @@ export default function SubmitExercise(props) {
   }, [])
 
   return (
-    <Container>
+    <Box sx={{ px: 2 }}>
       <Grid container spacing={4}>
         <Grid item xs={7}>
           <Typography variant="h5">{exercise.name}</Typography>
@@ -98,7 +98,7 @@ export default function SubmitExercise(props) {
           </Grid>
         </Grid>
 
-        <Grid item xs={6}>
+        <Grid item sm={12} md={6}>
           <Grid container spacing={4}>
             <Grid item xs={12}>
               <Typography variant="h6" paragraph>
@@ -116,7 +116,7 @@ export default function SubmitExercise(props) {
               <DataTable
                 columns={columns}
                 rows={exercise.testcases_min}
-                sx={{ "& .MuiDataGrid-cell": { display: "inline" } }}
+                sx={{ "& .MuiDataGrid-cell": { display: "inline", overflow: "scroll" } }}
                 getRowHeight={({ model }) => {
                   const input_lines = model.input_example.split("\n")?.length
                   const output_lines = model.output_example.split("\n")?.length
@@ -130,7 +130,7 @@ export default function SubmitExercise(props) {
           </Grid>
         </Grid>
 
-        <Grid item xs={6}>
+        <Grid item sm={12} md={6}>
           <Typography variant="h6" paragraph>
             Código solución
           </Typography>
@@ -147,6 +147,6 @@ export default function SubmitExercise(props) {
           </Card>
         </Grid>
       </Grid>
-    </Container>
+    </Box>
   )
 }
