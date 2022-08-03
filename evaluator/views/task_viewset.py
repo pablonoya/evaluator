@@ -4,16 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 
-from evaluator.models import Assignment, Task, Topic
-from evaluator.serializers import AssignmentSerializer, TaskSerializer, TopicSerializer
-
-
-class TopicView(viewsets.ModelViewSet):
-    serializer_class = TopicSerializer
-    queryset = Topic.objects.all()
-    permission_classes = (IsAuthenticated,)
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ["name"]
+from evaluator.models import Task, Assignment
+from evaluator.serializers import TaskSerializer
 
 
 class TaskView(viewsets.ModelViewSet):
@@ -46,9 +38,3 @@ class TaskView(viewsets.ModelViewSet):
         )
 
         return Response(queryset)
-
-
-class AssignmentView(viewsets.ModelViewSet):
-    serializer_class = AssignmentSerializer
-    queryset = Assignment.objects.all()
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]

@@ -1,4 +1,4 @@
-from django.db.models import Exists, OuterRef, Value, Sum
+from django.db.models import Exists, OuterRef, Sum
 
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
@@ -26,16 +26,11 @@ class PracticeViewSet(viewsets.ModelViewSet):
         )["exercises_count"]
 
         if practice.exercises.count() < exercises_count:
-            print("add exercises")
             assignments = task.assignment_set.all()
             for assignment in assignments:
                 exercises = Exercise.objects.filter(topics__in=[assignment.topic])
 
                 if practice.exercises.count() > 0:
-                    print(
-                        "exclude exercises",
-                        practice.exercises.values_list("id", flat=True),
-                    )
                     exercises = exercises.exclude(
                         id__in=practice.exercises.values_list("id", flat=True)
                     )

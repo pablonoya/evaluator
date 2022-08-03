@@ -4,6 +4,7 @@ from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+
 from evaluator.models import Submission
 from evaluator.serializers import SubmissionSerializer
 
@@ -15,9 +16,9 @@ class SubmissionView(viewsets.ModelViewSet):
     search_fields = ["exercise__name", "user__first_name", "user__last_name"]
 
     def get_queryset(self):
+        queryset = Submission.objects.all()
         user = User.objects.get(id=self.request.user.id)
         student_group = Group.objects.get(name="Alumnos")
-        queryset = Submission.objects.all()
 
         if student_group in user.groups.all():
             queryset = queryset.filter(user=self.request.user.id).order_by(
