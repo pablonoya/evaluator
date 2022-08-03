@@ -1,8 +1,9 @@
-from django.http import HttpResponse
-import pandas as pd
-
 from decimal import Decimal
+import pandas as pd
+from drf_yasg.utils import swagger_auto_schema
 
+
+from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 from django.db.models import (
     Q,
@@ -14,17 +15,25 @@ from django.db.models import (
     Func,
     DecimalField,
 )
-
 from django.db.models.functions import Coalesce
 
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 
 from evaluator.models import Assignment, Practice, Submission
 
 
 class ReportView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    def get_serializer_class(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Serializer
+
+    @swagger_auto_schema(auto_schema=None)
+    def list():
+        return super().list()
+
     def paginated_response(self, queryset):
         page = self.paginate_queryset(queryset)
         if page is not None:

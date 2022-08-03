@@ -15,25 +15,29 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path
-from django.conf import settings
 
-from django.views.static import serve
-from django.conf.urls.static import static
 from django.views.generic import TemplateView
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Evaluator API",
+        default_version="v1",
+        description="Swagger UI documentation for Evaluator API",
+        license=openapi.License(name="MIT License"),
+    ),
+    public=True,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(
+        "swagger-ui/",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
     path("evaluator/", include("evaluator.urls")),
-    # re_path(
-    #     r"^assets/(?P<path>.*)$",
-    #     serve,
-    #     {"document_root": settings.STATIC_ROOT / "assets"},
-    # ),
-    # re_path(
-    #     r"^tinymce/(?P<path>.*)$",
-    #     serve,
-    #     {"document_root": settings.STATIC_ROOT / "tinymce"},
-    # ),
-    re_path(r"^.*$", TemplateView.as_view(template_name="index.html")),
-    # Django serves staticfiles hack, don't include it in production!
+    re_path(r"^(?P<path>.*)/$", TemplateView.as_view(template_name="index.html")),
+    path("", TemplateView.as_view(template_name="index.html")),
 ]

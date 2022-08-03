@@ -13,6 +13,7 @@ from corsheaders.defaults import default_headers
 from datetime import timedelta
 from pathlib import Path
 import os
+import re
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     # "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "drf_yasg",
     "django_vite",
     "base",
     "evaluator.apps.EvaluatorConfig",
@@ -156,12 +158,8 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [DJANGO_VITE_ASSETS_PATH]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-import re
-
 # Vite generates files with 8 hash digits
 # http://whitenoise.evans.io/en/stable/django.html#WHITENOISE_IMMUTABLE_FILE_TEST
-
-
 def immutable_file_test(path, url):
     # Match filename with 12 hex digits before the extension
     # e.g. app.db8f2edc0c8a.js
@@ -205,5 +203,11 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
+    }
+}
+
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"},
     }
 }

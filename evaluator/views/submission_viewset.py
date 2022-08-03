@@ -17,6 +17,8 @@ class SubmissionView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Submission.objects.all()
+        if getattr(self, "swagger_fake_view", False):
+            return queryset
         user = User.objects.get(id=self.request.user.id)
         student_group = Group.objects.get(name="Alumnos")
 

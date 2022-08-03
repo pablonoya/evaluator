@@ -14,6 +14,9 @@ class PracticeViewSet(viewsets.ModelViewSet):
     search_fields = ["task__name", "exercise__name"]
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Practice.objects.all()
+
         user = self.request.user.id
         task_id = self.request.query_params.get("taskId")
         task = Task.objects.get(id=task_id)
