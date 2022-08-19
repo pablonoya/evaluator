@@ -6,6 +6,7 @@ import authService from "../../services/authService"
 
 import TextFieldForm from "../../components/TextFieldForm"
 import PasswordFieldForm from "../../components/PaswordFieldForm"
+import WithRole from "../../components/WithRole"
 
 export default function Profile(props) {
   const { showNotification } = props
@@ -51,10 +52,14 @@ export default function Profile(props) {
         <Form>
           <TextFieldForm name="last_name" label="Apellido(s)" margin="dense" required />
           <TextFieldForm name="first_name" label="Nombre(s)" margin="dense" required />
-          <TextFieldForm name="cu" label="Carnet universitario" margin="dense" required />
+          <WithRole role="Alumnos">
+            <TextFieldForm name="cu" label="Carnet universitario" margin="dense" required />
+          </WithRole>
           <TextFieldForm name="username" label="Nombre de usuario" margin="dense" required />
-          <TextFieldForm name="phone" label="Celular" margin="dense" />
           <TextFieldForm name="email" label="Email" margin="dense" />
+          <WithRole role="Alumnos">
+            <TextFieldForm name="phone" label="Celular" margin="dense" />
+          </WithRole>
 
           <PasswordFieldForm
             name="password"

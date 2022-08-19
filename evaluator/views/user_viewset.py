@@ -103,16 +103,29 @@ class UserView(viewsets.ModelViewSet):
             return Response(
                 "Nombre de usuario no disponible", status=status.HTTP_401_UNAUTHORIZED
             )
+        if (
+            user.email != request.data.get("email")
+            and User.objects.filter(email=request.data.get("email")).exists()
+        ):
+            return Response("Email ya registrado", status=status.HTTP_401_UNAUTHORIZED)
+        if (
+            user.student.phone != request.data.get("phone")
+            and User.objects.filter(student__phone=request.data.get("phone")).exists()
+        ):
+            return Response(
+                "Celular ya registrado", status=status.HTTP_401_UNAUTHORIZED
+            )
 
         user.first_name = request.data.get("first_name")
         user.last_name = request.data.get("last_name")
         user.username = request.data.get("username")
         user.email = request.data.get("email")
-        user.student.cu = request.data.get("cu")
-        user.student.phone = request.data.get("phone")
-
         user.save()
-        user.student.save()
+
+        if user.groups.filter(name="Alumnos").exists():
+            user.student.cu = request.data.get("cu")
+            user.student.phone = request.data.get("phone")
+            user.student.save()
 
         return Response("Perfil actualizado")
 
