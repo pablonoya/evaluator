@@ -25,6 +25,7 @@ openpyxl = "^3.0.9"
 whitenoise = "^6.2.0"
 daphne = "^3.0.2"
 drf-yasg = "^1.21.3"
+python-decouple = "^3.6"
 
 [tool.poetry.dev-dependencies]
 

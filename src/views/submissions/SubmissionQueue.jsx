@@ -46,7 +46,7 @@ export default function SubmissionQueue(props) {
   }
 
   function connectWebSocket() {
-    ws.current = new WebSocket("ws://localhost:8000/ws/submissions/")
+    ws.current = new WebSocket(import.meta.env.VITE_API_WS_URL)
 
     ws.current.onmessage = handleOnMessage
 
