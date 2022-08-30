@@ -108,7 +108,7 @@ export default function Topics(props) {
                 startIcon={<Refresh />}
                 loading={loading}
                 loadingPosition="start"
-                onClick={getTopics}
+                onClick={() => getTopics()}
               >
                 Actualizar
               </LoadingButton>

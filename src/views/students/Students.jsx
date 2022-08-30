@@ -148,7 +148,7 @@ export default function Students(props) {
                 startIcon={<Refresh />}
                 loading={loading}
                 loadingPosition="start"
-                onClick={getStudents}
+                onClick={() => getStudents()}
               >
                 Actualizar
               </LoadingButton>

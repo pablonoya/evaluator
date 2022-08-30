@@ -15,6 +15,7 @@ const apiInstance = axios.create(
 
 apiInstance.interceptors.response.use(null, error => {
   if (
+    error.config &&
     [
       "/evaluator/api/token/",
       "/evaluator/api/users/change_password/",
@@ -31,7 +32,7 @@ apiInstance.interceptors.response.use(null, error => {
 
   return new Promise((resolve, reject) => {
     if (error.response.status === 401) {
-      let originalRequest = error.config
+      let originalRequest = error?.config
 
       let res = apiInstance
         .post("/evaluator/api/token/refresh/", {
